@@ -13,7 +13,7 @@
 
 	<name>Compiler Lifecycle Bill of Sources</name>
 	<url>https://github.com/RunedUniverse/compiler-maven-extension</url>
-	<inceptionYear>2022</inceptionYear>
+	<inceptionYear>2023</inceptionYear>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
