@@ -1,0 +1,102 @@
+<project-execution-model
+	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem 
+	https://api.runeduniverse.net/runes4tools/r4m-pem-v1.xsd">
+
+	<modelVersion>1.0.0</modelVersion>
+	<executions>
+
+		<execution source="plugin" id="default">
+			<triggers>
+				<default />
+				<on-call />
+				<packaging-procedure>lib</packaging-procedure>
+			</triggers>
+			<lifecycles>
+				<lifecycle id="default">
+					<phases>
+						<phase id="compile">
+							<goals>
+								<goal id="compiler-summary">
+									<groupId>net.runeduniverse.tools.maven.compiler</groupId>
+									<artifactId>compiler-maven-extension</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<fork>
+										<executions>
+											<execution id="default" />
+										</executions>
+										<lifecycle id="compiler" />
+									</fork>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="test-compile">
+							<goals>
+								<goal id="compiler-summary">
+									<groupId>net.runeduniverse.tools.maven.compiler</groupId>
+									<artifactId>compiler-maven-extension</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<fork>
+										<executions>
+											<execution id="test" />
+										</executions>
+										<lifecycle id="compiler" />
+									</fork>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+				<lifecycle id="compiler">
+					<phases>
+						<phase id="scan-references">
+							<goals>
+								<goal id="compiler-scan-references">
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<groupId>net.runeduniverse.tools.maven.compiler</groupId>
+									<artifactId>compiler-maven-extension</artifactId>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+
+		<execution source="plugin" id="test">
+			<triggers>
+				<on-call />
+				<packaging-procedure>lib</packaging-procedure>
+			</triggers>
+			<lifecycles>
+				<lifecycle id="compiler">
+					<phases>
+						<phase id="scan-references">
+							<goals>
+								<goal id="compiler-scan-test-references">
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<groupId>net.runeduniverse.tools.maven.compiler</groupId>
+									<artifactId>compiler-maven-extension</artifactId>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+
+	</executions>
+</project-execution-model>

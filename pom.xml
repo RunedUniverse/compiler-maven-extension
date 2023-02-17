@@ -1,0 +1,65 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>net.runeduniverse.tools.maven.compiler</groupId>
+	<artifactId>compiler-parent</artifactId>
+	<version>0.0.0</version>
+	<packaging>pom</packaging>
+
+	<name>Compiler Lifecycle Parent</name>
+	<url>https://github.com/RunedUniverse/compiler-maven-extension</url>
+	<inceptionYear>2023</inceptionYear>
+
+	<modules>
+		<module>sources</module>
+		<module>api</module>
+		<module>extension</module>
+	</modules>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>RunedUniverse</name>
+		<url>https://www.runeduniverse.net</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>pl4yingnight</id>
+			<name>Pl4yingNight</name>
+			<email>pl4yingnight@gmail.com</email>
+			<organization>RunedUniverse</organization>
+			<organizationUrl>https://www.runeduniverse.net</organizationUrl>
+			<timezone>Europe/Vienna</timezone>
+			<roles>
+				<role>Maintainer</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/RunedUniverse/compiler-maven-extension</url>
+		<connection>scm:git:http://github.com/RunedUniverse/compiler-maven-extension.git</connection>
+		<developerConnection>scm:git:git@github.com:RunedUniverse/compiler-maven-extension.git</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/RunedUniverse/compiler-maven-extension/issues</url>
+	</issueManagement>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- VERSIONS -->
+		<major-version>0</major-version>
+		<minor-version>0</minor-version>
+		<artifact-version>0</artifact-version>
+		<!-- ARTIFACT VERSIONS -->
+		<maven-version-min>3.3.9</maven-version-min>
+	</properties>
+</project>

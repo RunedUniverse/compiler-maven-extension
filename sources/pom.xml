@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>net.runeduniverse.tools.maven.compiler</groupId>
+		<artifactId>compiler-parent</artifactId>
+		<version>0.0.0</version>
+	</parent>
+
+	<artifactId>compiler-bom-sources</artifactId>
+	<version>${major-version}.${minor-version}.${artifact-version}</version>
+	<packaging>pom</packaging>
+
+	<name>Compiler Lifecycle Bill of Sources</name>
+	<url>https://github.com/RunedUniverse/compiler-maven-extension</url>
+	<inceptionYear>2022</inceptionYear>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<artifact-version>0</artifact-version>
+
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<!-- VERSIONS -->
+		<maven-version>3.8.4</maven-version>
+		<!-- ARTIFACT VERSIONS -->
+		<runeduniverse-utils-common-version>[1.0.1,)</runeduniverse-utils-common-version>
+		<runeduniverse-utils-logging-version>[1.0.1,)</runeduniverse-utils-logging-version>
+		<plexus-utils-version>3.3.0</plexus-utils-version>
+		<!-- ARTIFACT VERSIONS - TESTING -->
+	</properties>
+
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>RunedUniverse</name>
+		<url>https://www.runeduniverse.net</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>pl4yingnight</id>
+			<name>Pl4yingNight</name>
+			<email>pl4yingnight@gmail.com</email>
+			<organization>RunedUniverse</organization>
+			<organizationUrl>https://www.runeduniverse.net</organizationUrl>
+			<timezone>Europe/Vienna</timezone>
+			<roles>
+				<role>Maintainer</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Maven Core -->
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-core</artifactId>
+				<version>${maven-version}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<!-- UTILS -->
+			<dependency>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-utils</artifactId>
+				<version>${plexus-utils-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.runeduniverse.lib.utils</groupId>
+				<artifactId>utils-common</artifactId>
+				<version>${runeduniverse-utils-common-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.runeduniverse.lib.utils</groupId>
+				<artifactId>utils-logging</artifactId>
+				<version>${runeduniverse-utils-logging-version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+</project>
