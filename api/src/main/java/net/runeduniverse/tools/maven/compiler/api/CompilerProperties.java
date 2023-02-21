@@ -12,9 +12,9 @@ public interface CompilerProperties {
 			public static String EXECUTION_DEFAULT_ID = "default";
 			public static String EXECUTION_TEST_ID = "test";
 
-			public static String PARAM_SOURCE_DIR = "compiler-extension.main.source.dir";
-			public static String PARAM_TEST_SOURCE_DIR = "compiler-extension.test.source.dir";
-			public static String PARAM_TARGET_DIR = "compiler-extension.target.dir";
+			//public static String PARAM_SOURCE_DIR = "compiler-extension.main.source.dir";
+			//public static String PARAM_TEST_SOURCE_DIR = "compiler-extension.test.source.dir";
+			//public static String PARAM_TARGET_DIR = "compiler-extension.target.dir";
 		}
 	}
 }

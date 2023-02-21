@@ -6,35 +6,35 @@ import java.util.Set;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.tools.maven.compiler.api.BuilderRuntime;
-import net.runeduniverse.tools.maven.compiler.api.ReferenceFileScanner;
-import net.runeduniverse.tools.maven.compiler.api.ReferenceMap;
-import net.runeduniverse.tools.maven.compiler.api.ReferenceScanner;
+import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
+import net.runeduniverse.tools.maven.compiler.api.IReferenceFileScanner;
+import net.runeduniverse.tools.maven.compiler.api.IReferenceMap;
+import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
 
-@Component(role = ReferenceScanner.class)
-public class DefaultReferenceScanner implements ReferenceScanner {
+@Component(role = IReferenceScanner.class)
+public class DefaultReferenceScanner implements IReferenceScanner {
 
-	protected BuilderRuntime runtime;
-	protected ReferenceMap references;
-	protected Set<ReferenceFileScanner> scanner = new HashSet<>();
+	protected ICompilerRuntime runtime;
+	protected IReferenceMap references;
+	protected Set<IReferenceFileScanner> scanner = new HashSet<>();
 
 	public DefaultReferenceScanner() {
 	}
 	
 	@Override
-	public ReferenceScanner inject(BuilderRuntime runtime) {
+	public IReferenceScanner inject(ICompilerRuntime runtime) {
 		this.runtime = runtime;
 		return this;
 	}
 
 	@Override
-	public ReferenceScanner inject(ReferenceMap resultMap) {
+	public IReferenceScanner inject(IReferenceMap resultMap) {
 		this.references = resultMap;
 		return this;
 	}
 
 	@Override
-	public ReferenceScanner inject(Set<ReferenceFileScanner> fileScanner) {
+	public IReferenceScanner inject(Set<IReferenceFileScanner> fileScanner) {
 		this.scanner.addAll(fileScanner);
 		return this;
 	}
