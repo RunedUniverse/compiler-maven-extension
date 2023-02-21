@@ -5,6 +5,8 @@ import java.io.File;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.component.annotations.Component;
 
+import net.runeduniverse.tools.maven.compiler.api.BuilderRuntime;
+
 @Component(role = BuilderRuntime.class, hint = "builder-test")
 public class TestBuilderRuntime implements BuilderRuntime {
 

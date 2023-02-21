@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.maven.compiler;
+package net.runeduniverse.tools.maven.compiler.api;
 
 import java.util.Set;
 

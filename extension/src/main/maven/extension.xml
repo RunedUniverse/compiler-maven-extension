@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension>
+
+	<exportedPackages>
+		<!-- compiler-maven-extension -->
+		<exportedPackage>net.runeduniverse.tools.maven.compiler.api
+		</exportedPackage>
+
+		<!-- runeduniverse-utils -->
+		<exportedPackage>net.runeduniverse.lib.utils.common</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.logging</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.logging.logs
+		</exportedPackage>
+	</exportedPackages>
+
+	<exportedArtifacts>
+		<!-- r4m-maven-extension -->
+		<exportedArtifact>net.runeduniverse.tools.maven.compiler:compiler-api
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.tools.maven.compiler:compiler-maven-extension
+		</exportedArtifact>
+
+		<!-- runeduniverse-utils -->
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-common
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-logging
+		</exportedArtifact>
+	</exportedArtifacts>
+
+</extension>

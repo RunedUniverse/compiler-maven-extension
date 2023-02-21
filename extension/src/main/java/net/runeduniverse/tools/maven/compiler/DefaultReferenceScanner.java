@@ -6,6 +6,11 @@ import java.util.Set;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.component.annotations.Component;
 
+import net.runeduniverse.tools.maven.compiler.api.BuilderRuntime;
+import net.runeduniverse.tools.maven.compiler.api.ReferenceFileScanner;
+import net.runeduniverse.tools.maven.compiler.api.ReferenceMap;
+import net.runeduniverse.tools.maven.compiler.api.ReferenceScanner;
+
 @Component(role = ReferenceScanner.class)
 public class DefaultReferenceScanner implements ReferenceScanner {
 

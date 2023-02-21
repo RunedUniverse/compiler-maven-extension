@@ -6,8 +6,9 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.tools.maven.compiler.ReferenceFileScanner;
-import net.runeduniverse.tools.maven.compiler.ReferenceScanner;
+import net.runeduniverse.tools.maven.compiler.api.ReferenceFileScanner;
+import net.runeduniverse.tools.maven.compiler.api.ReferenceScanner;
+import net.runeduniverse.tools.maven.compiler.api.mojo.AMainBuilderMojo;
 
 /**
  * Maps out all references of the source files to later be able to compile
