@@ -4,16 +4,10 @@ import java.io.File;
 
 public interface ICompilerRuntime {
 
+	public void initialize(final File sourceDirectory, final File targetDirectory);
+
 	public File getSourceDirectory();
 
-	public File getTestSourceDirectory();
-
 	public File getTargetDirectory();
-
-	public void setSourceDirectory(File value);
-
-	public void setTestSourceDirectory(File value);
-
-	public void setTargetDirectory(File value);
 
 }

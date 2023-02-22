@@ -6,10 +6,11 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.project.MavenProject;
+
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
-import net.runeduniverse.tools.maven.compiler.api.IReferenceFileScanner;
-import net.runeduniverse.tools.maven.compiler.api.IReferenceMap;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
+import net.runeduniverse.tools.maven.compiler.api.IRuntimeScanner;
 
 /**
  * Maps out all references of the source files to later be able to compile
@@ -45,63 +46,62 @@ public class ScanReferencesMojo extends AbstractMojo {
 	 */
 	private File targetDirectory;
 	/**
+	 * @parameter property="compiler-extension.test.target.dir"
+	 *            default-value="${project.build.testOutputDirectory}"
+	 * @readonly
+	 * @required
+	 */
+	private File testTargetDirectory;
+	/**
 	 * @parameter default-value="${mojoExecution}"
 	 * @readonly
 	 * @required
 	 */
 	private MojoExecution mojoExecution;
+	/**
+	 * @parameter default-value="${project}"
+	 * @readonly
+	 */
+	private MavenProject mvnProject;
 
-	/**
-	 * @component
-	 */
-	private IReferenceScanner scanner;
-	/**
-	 * @component
-	 */
-	private Map<String, IReferenceFileScanner> fileScanner;
 	/**
 	 * @component
 	 */
 	private ICompilerRuntime runtime;
-
 	/**
-	 * @component
+	 * @component role="net.runeduniverse.tools.maven.compiler.api.IRuntimeScanner"
 	 */
-	private IReferenceMap references;
+	private Map<String, IRuntimeScanner> runtimeScannerMap;
+	/**
+	 * @component role="net.runeduniverse.tools.maven.compiler.api.IReferenceScanner"
+	 */
+	private Map<String, IReferenceScanner> refScanner;
+
+	private IRuntimeScanner runtimeScanner;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		this.getLog()
-				.info("MojoExecution: " + this.mojoExecution);
 
-		if (this.runtime == null) {
-			this.getLog()
-					.warn("ICompilerRuntime is null");
+		// select IRuntimeScanner
+		this.runtimeScanner = this.runtimeScannerMap.get(this.mojoExecution.getExecutionId());
+		if (this.runtimeScanner == null)
+			this.runtimeScanner = this.runtimeScannerMap.get("default");
+
+		// initialize ICompilerRuntime
+		if (this.runtimeScanner.isTestExecution()) {
+			this.runtime.initialize(this.testSourceDirectory, this.testTargetDirectory);
 		} else {
-			this.runtime.setSourceDirectory(this.sourceDirectory);
-			this.runtime.setTestSourceDirectory(this.testSourceDirectory);
-			this.runtime.setTargetDirectory(this.targetDirectory);
-
-			this.getLog()
-					.info("ICompilerRuntime is <" + this.runtime.getClass()
-							.getCanonicalName() + ">");
-			this.getLog()
-					.info("SourceDirectory: " + this.runtime.getSourceDirectory());
-			this.getLog()
-					.info("TestSourceDirectory: " + this.runtime.getTestSourceDirectory());
-			this.getLog()
-					.info("TargetDirectory: " + this.runtime.getTargetDirectory());
+			this.runtime.initialize(this.sourceDirectory, this.targetDirectory);
 		}
 
-		/*
-		 * getLog().info((this.runtime==null)+""); scanner.inject(this.runtime)
-		 * .inject(this.fileScanner) .inject(this.references);
-		 */
-
 		getLog().info("mapping references of source-files");
-		// scanner.logInfo(getLog());
+		for (IReferenceScanner scanner : this.refScanner.values()) {
+			scanner.logInfo(getLog());
+		}
 		// TODO collect collectors from compiler plugins and run those
-		// scanner.logAnalisis(getLog());
+		for (IReferenceScanner scanner : this.refScanner.values()) {
+			scanner.logAnalisis(getLog());
+		}
 		getLog().info("finished mapping references of source-files");
 	}
 }
