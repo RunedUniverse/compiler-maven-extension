@@ -5,8 +5,10 @@ public interface CompilerProperties {
 	public static String ARTIFACT_ID = "compiler-maven-extension";
 	public static String PREFIX_ID = "compiler";
 
+	public static String LIFECYCLE_PARTICIPANT_HINT = "compiler";
+
 	public interface LIFECYCLE {
-		public interface BUILDER {
+		public interface COMPILER {
 			public static String LIFECYCLE_HINT = "compiler";
 
 			public static String EXECUTION_DEFAULT_ID = "default";

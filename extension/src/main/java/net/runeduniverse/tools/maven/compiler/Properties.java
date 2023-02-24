@@ -15,7 +15,7 @@ public interface Properties extends MavenProperties, CompilerProperties {
 	}
 
 	public interface LIFECYCLE {
-		public interface BUILDER extends CompilerProperties.LIFECYCLE.BUILDER {
+		public interface COMPILER extends CompilerProperties.LIFECYCLE.COMPILER {
 			public static String DEFAULT_VAL_SOURCE_DIR = VAL_PREFIX + Properties.PROJECT.BUILD.PARAM_SOURCE_DIR
 					+ VAL_POSTFIX;
 			public static String DEFAULT_VAL_TEST_SOURCE_DIR = VAL_PREFIX

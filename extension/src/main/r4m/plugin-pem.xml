@@ -11,6 +11,7 @@
 			<triggers>
 				<default />
 				<on-call />
+				<packaging-procedure>lib</packaging-procedure>
 			</triggers>
 			<lifecycles>
 				<lifecycle id="compiler">
@@ -35,6 +36,7 @@
 		<execution source="plugin" id="test">
 			<triggers>
 				<on-call />
+				<packaging-procedure>lib</packaging-procedure>
 			</triggers>
 			<lifecycles>
 				<lifecycle id="compiler">

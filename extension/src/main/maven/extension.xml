@@ -5,6 +5,8 @@
 		<!-- compiler-maven-extension -->
 		<exportedPackage>net.runeduniverse.tools.maven.compiler.api
 		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.compiler.mojos
+		</exportedPackage>
 
 		<!-- runeduniverse-utils -->
 		<exportedPackage>net.runeduniverse.lib.utils.common</exportedPackage>

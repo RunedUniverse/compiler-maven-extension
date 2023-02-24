@@ -83,11 +83,6 @@
 			<artifactId>maven-core</artifactId>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-utils</artifactId>
-			<!-- maven doesn't provide it to extensions -->
-		</dependency>
 
 		<!-- logging utilities-->
 		<dependency>
