@@ -2,16 +2,18 @@
 	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem 
-	https://api.runeduniverse.net/runes4tools/r4m-pem-v1.xsd">
+	https://api.runeduniverse.net/runes4tools/r4m-pem-v1_0_0.xsd">
 
 	<modelVersion>1.0.0</modelVersion>
 	<executions>
 
 		<execution source="plugin" id="default">
+			<restrictions>
+				<packaging-procedure>lib</packaging-procedure>
+			</restrictions>
 			<triggers>
 				<default />
 				<on-call />
-				<packaging-procedure>lib</packaging-procedure>
 			</triggers>
 			<lifecycles>
 				<lifecycle id="compiler">
@@ -34,9 +36,11 @@
 		</execution>
 
 		<execution source="plugin" id="test">
+			<restrictions>
+				<packaging-procedure>lib</packaging-procedure>
+			</restrictions>
 			<triggers>
 				<on-call />
-				<packaging-procedure>lib</packaging-procedure>
 			</triggers>
 			<lifecycles>
 				<lifecycle id="compiler">
