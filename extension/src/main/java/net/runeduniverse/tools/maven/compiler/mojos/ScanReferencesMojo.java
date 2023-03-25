@@ -2,10 +2,14 @@ package net.runeduniverse.tools.maven.compiler.mojos;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
@@ -95,6 +99,10 @@ public class ScanReferencesMojo extends AbstractMojo {
 	/**
 	 * @component
 	 */
+	private ClassRealmManager classRealmManager;
+	/**
+	 * @component
+	 */
 	private MavenPluginManager pluginManager;
 	/**
 	 * @component
@@ -177,10 +185,10 @@ public class ScanReferencesMojo extends AbstractMojo {
 				getLog().error(cDescriptor.getRole());
 			}
 
-			getLog().warn("Realm:");
-			for (URL url : pluginRealm.getURLs()) {
-				getLog().error(url.getFile());
-			}
+			// getLog().warn("Realm:");
+			// for (URL url : pluginRealm.getURLs()) {
+			// getLog().error(url.getFile());
+			// }
 			// if we are unable to detect if the interface <IReferenceScanner> is
 			// implemented via plexus throw it all into the PackageScanner and scan it this
 			// way -> it will find it as long as the file exists
@@ -188,6 +196,38 @@ public class ScanReferencesMojo extends AbstractMojo {
 				| InvalidPluginDescriptorException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static <T> List<ComponentDescriptor<T>> getComponentDescriptorList(final PlexusContainer container,
+			final ClassRealm realm, Class<T> type, String role) {
+		synchronized (container) {
+			ClassRealm oldLookupRealm = container.setLookupRealm(realm);
+			ClassLoader oldClassLoader = Thread.currentThread()
+					.getContextClassLoader();
+			try {
+				return container.getComponentDescriptorList(type, role);
+			} finally {
+				Thread.currentThread()
+						.setContextClassLoader(oldClassLoader);
+				container.setLookupRealm(oldLookupRealm);
+			}
+		}
+	}
+
+	public static boolean hasComponent(final PlexusContainer container, final ClassRealm realm, Class<?> type,
+			ClassRealm... excludedRealms) {
+		List<ComponentDescriptor<?>> excluded = new LinkedList<>();
+		for (ClassRealm excludedRealm : excludedRealms) {
+			if (realm == excludedRealm)
+				return false;
+			for (ComponentDescriptor<?> component : getComponentDescriptorList(container, realm, type, null))
+				if (!excluded.contains(component))
+					excluded.add(component);
+		}
+		for (ComponentDescriptor<?> component : getComponentDescriptorList(container, realm, type, null))
+			if (!excluded.contains(component))
+				return true;
+		return false;
 	}
 
 	private void crawlRealm(ClassRealm pluginRealm) {
@@ -201,12 +241,22 @@ public class ScanReferencesMojo extends AbstractMojo {
 		try {
 
 			getLog().warn(pluginRealm.getId());
-			// realm.display();
-			
-			Map<String, IReferenceScanner> scanner = this.container.lookupMap(IReferenceScanner.class);
-			
-			for (String id : scanner.keySet()) {
-				getLog().error(id);
+			List<ComponentDescriptor<IReferenceScanner>> components = new LinkedList<>(
+					this.container.getComponentDescriptorList(IReferenceScanner.class, null));
+
+			for (ComponentDescriptor<IReferenceScanner> component : components) {
+				getLog().error(component.getRoleHint());
+			}
+
+			if (this.container.hasComponent(IReferenceScanner.class)) {
+
+				// pluginRealm.display();
+
+				Map<String, IReferenceScanner> scanner = this.container.lookupMap(IReferenceScanner.class);
+
+				// for (String id : scanner.keySet()) {
+				// getLog().error(id);
+				// }
 			}
 
 		} catch (ComponentLookupException e) {
@@ -233,11 +283,20 @@ public class ScanReferencesMojo extends AbstractMojo {
 		getLog().info("");
 
 		ClassWorld classWorld = currentRealm.getWorld();
-		for (ClassRealm realm : classWorld.getRealms()) {
-			if (!realm.getId()
-					.startsWith("plugin"))
-				continue;
-			crawlRealm(realm);
+		for (ClassRealm pluginRealm : classWorld.getRealms()) {
+			
+			getLog().warn(pluginRealm.getId());
+			if(hasComponent(this.container, pluginRealm, IReferenceScanner.class, this.classRealmManager.getMavenApiRealm()))
+				getLog().error("yep");
+			else
+				getLog().error("nope");
+			
+			//if (!pluginRealm.getId()
+			//		.startsWith("plugin")
+			//		&& !pluginRealm.getId()
+			//				.equals("maven.api"))
+			//	continue;
+			//crawlRealm(pluginRealm);
 
 		}
 	}
