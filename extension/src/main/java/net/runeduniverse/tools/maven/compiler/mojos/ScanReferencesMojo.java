@@ -20,10 +20,12 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
@@ -89,6 +91,10 @@ public class ScanReferencesMojo extends AbstractMojo {
 	/**
 	 * @component
 	 */
+	private PlexusContainer container;
+	/**
+	 * @component
+	 */
 	private MavenPluginManager pluginManager;
 	/**
 	 * @component
@@ -124,58 +130,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 			this.runtime.initialize(this.sourceDirectory, this.targetDirectory);
 		}
 
-		// forceload all build plugins
-		// maybe later only load plugins which are active in current lifecycle
-		// execution?
-		for (Plugin mvnPlugin : this.mvnProject.getBuildPlugins()) {
-			try {
-				PluginDescriptor descriptor = this.pluginManager.getPluginDescriptor(mvnPlugin,
-						this.mvnProject.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
-
-				getLog().warn(descriptor.getGroupId() + ":" + descriptor.getArtifactId());
-				// getLog().warn("Dependencies:");
-				// for (ComponentDependency dependency : descriptor.getDependencies()) {
-				// getLog().error(dependency.getGroupId()+":"+dependency.getArtifactId());
-				// }
-				// getLog().warn("Artifacts:");
-				// if (descriptor.getIntroducedDependencyArtifacts() != null)
-				// for (Artifact artifact : descriptor.getIntroducedDependencyArtifacts()) {
-				// getLog().error(artifact.getGroupId() + ":" + artifact.getArtifactId());
-				// }
-				getLog().warn("Components:");
-				for (ComponentDescriptor<?> cDescriptor : descriptor.getComponents()) {
-					getLog().error(cDescriptor.getRole());
-				}
-
-				ClassRealm pluginRealm = this.buildPluginManager.getPluginRealm(this.mvnSession, descriptor);
-				getLog().warn("Realm:");
-				URL[] urls = pluginRealm.getURLs();
-				for (int i = 0; i < urls.length; i++) {
-					getLog().error(urls[i].getFile());
-				}
-				// if we are unable to detect if the interface <IReferenceScanner> is
-				// implemented via plexus throw it all into the PackageScanner and scan it this
-				// way -> it will find it as long as the file exists
-			} catch (PluginResolutionException | PluginManagerException | PluginDescriptorParsingException
-					| InvalidPluginDescriptorException e) {
-				e.printStackTrace();
-			}
-		}
-
-		ClassRealm currentRealm = (ClassRealm) Thread.currentThread()
-				.getContextClassLoader();
-		currentRealm.display();
-		getLog().info("");
-
-		ClassWorld classWorld = currentRealm.getWorld();
-		for (ClassRealm realm : classWorld.getRealms()) {
-			if (!realm.getId()
-					.startsWith("plugin"))
-				continue;
-			getLog().warn(realm.getId());
-			// realm.display();
-
-		}
+		this.analyzeScanner();
 
 		getLog().info("");
 
@@ -188,5 +143,102 @@ public class ScanReferencesMojo extends AbstractMojo {
 			scanner.logAnalisis(getLog());
 		}
 		getLog().info("finished mapping references of source-files");
+	}
+
+	private void analyzeScanner(Plugin mvnPlugin) {
+		try {
+			PluginDescriptor descriptor = this.pluginManager.getPluginDescriptor(mvnPlugin,
+					this.mvnProject.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
+
+			getLog().info("");
+			getLog().warn(descriptor.getGroupId() + ":" + descriptor.getArtifactId());
+			// getLog().warn("Dependencies:");
+			// for (ComponentDependency dependency : descriptor.getDependencies()) {
+			// getLog().error(dependency.getGroupId()+":"+dependency.getArtifactId());
+			// }
+			// getLog().warn("Artifacts:");
+			// if (descriptor.getIntroducedDependencyArtifacts() != null)
+			// for (Artifact artifact : descriptor.getIntroducedDependencyArtifacts()) {
+			// getLog().error(artifact.getGroupId() + ":" + artifact.getArtifactId());
+			// }
+			getLog().warn("PRE_Components:");
+			for (ComponentDescriptor<?> cDescriptor : descriptor.getComponents()) {
+				getLog().error(cDescriptor.getRole());
+			}
+
+			final ClassRealm pluginRealm;
+			// pluginRealm = this.buildPluginManager.getPluginRealm(this.mvnSession,
+			// descriptor);
+			this.pluginManager.setupPluginRealm(descriptor, this.mvnSession, null, null, null);
+			pluginRealm = descriptor.getClassRealm();
+
+			getLog().warn("POST_Components:");
+			for (ComponentDescriptor<?> cDescriptor : descriptor.getComponents()) {
+				getLog().error(cDescriptor.getRole());
+			}
+
+			getLog().warn("Realm:");
+			for (URL url : pluginRealm.getURLs()) {
+				getLog().error(url.getFile());
+			}
+			// if we are unable to detect if the interface <IReferenceScanner> is
+			// implemented via plexus throw it all into the PackageScanner and scan it this
+			// way -> it will find it as long as the file exists
+		} catch (PluginResolutionException | PluginManagerException | PluginDescriptorParsingException
+				| InvalidPluginDescriptorException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void crawlRealm(ClassRealm pluginRealm) {
+		ClassRealm oldLookupRealm = this.container.setLookupRealm(pluginRealm);
+		ClassLoader oldClassLoader = Thread.currentThread()
+				.getContextClassLoader();
+
+		Thread.currentThread()
+				.setContextClassLoader(pluginRealm);
+
+		try {
+
+			getLog().warn(pluginRealm.getId());
+			// realm.display();
+			
+			Map<String, IReferenceScanner> scanner = this.container.lookupMap(IReferenceScanner.class);
+			
+			for (String id : scanner.keySet()) {
+				getLog().error(id);
+			}
+
+		} catch (ComponentLookupException e) {
+			e.printStackTrace();
+		} finally {
+			Thread.currentThread()
+					.setContextClassLoader(oldClassLoader);
+			this.container.setLookupRealm(oldLookupRealm);
+		}
+
+	}
+
+	private void analyzeScanner() {
+		// forceload all build plugins
+		// maybe later only load plugins which are active in current lifecycle
+		// execution?
+		for (Plugin mvnPlugin : this.mvnProject.getBuildPlugins()) {
+			analyzeScanner(mvnPlugin);
+		}
+
+		ClassRealm currentRealm = (ClassRealm) Thread.currentThread()
+				.getContextClassLoader();
+		currentRealm.display();
+		getLog().info("");
+
+		ClassWorld classWorld = currentRealm.getWorld();
+		for (ClassRealm realm : classWorld.getRealms()) {
+			if (!realm.getId()
+					.startsWith("plugin"))
+				continue;
+			crawlRealm(realm);
+
+		}
 	}
 }
