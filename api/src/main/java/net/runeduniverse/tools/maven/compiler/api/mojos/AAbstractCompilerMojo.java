@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.maven.compiler.api.mojo;
+package net.runeduniverse.tools.maven.compiler.api.mojos;
 
 import org.apache.maven.plugin.AbstractMojo;
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;

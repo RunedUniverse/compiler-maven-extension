@@ -1,21 +1,11 @@
 package net.runeduniverse.tools.maven.compiler.mojos;
 
 import java.io.File;
-import java.net.URL;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
@@ -25,24 +15,23 @@ import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.repository.ComponentDependency;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
 import net.runeduniverse.tools.maven.compiler.api.IRuntimeScanner;
 
+import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.hasComponent;
+import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.lookupMap;
+
 /**
  * Maps out all references of the source files to later be able to compile
  * source files in order
  * 
- * @author Pl4yingNight
+ * @author VenaNocta
  * @phase scan-references
  * @goal scan-references
  */
@@ -110,10 +99,6 @@ public class ScanReferencesMojo extends AbstractMojo {
 	/**
 	 * @component
 	 */
-	private BuildPluginManager buildPluginManager;
-	/**
-	 * @component
-	 */
 	private ICompilerRuntime runtime;
 	/**
 	 * @component role="net.runeduniverse.tools.maven.compiler.api.IRuntimeScanner"
@@ -156,107 +141,30 @@ public class ScanReferencesMojo extends AbstractMojo {
 		getLog().info("finished mapping references of source-files");
 	}
 
-	private void analyzeScanner(Plugin mvnPlugin) {
-		try {
-			PluginDescriptor descriptor = this.pluginManager.getPluginDescriptor(mvnPlugin,
-					this.mvnProject.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
-
-			getLog().info("");
-			getLog().warn(descriptor.getGroupId() + ":" + descriptor.getArtifactId());
-			// getLog().warn("Dependencies:");
-			// for (ComponentDependency dependency : descriptor.getDependencies()) {
-			// getLog().error(dependency.getGroupId()+":"+dependency.getArtifactId());
-			// }
-			// getLog().warn("Artifacts:");
-			// if (descriptor.getIntroducedDependencyArtifacts() != null)
-			// for (Artifact artifact : descriptor.getIntroducedDependencyArtifacts()) {
-			// getLog().error(artifact.getGroupId() + ":" + artifact.getArtifactId());
-			// }
-			getLog().warn("PRE_Components:");
-			for (ComponentDescriptor<?> cDescriptor : descriptor.getComponents()) {
-				getLog().error(cDescriptor.getRole());
-			}
-
-			final ClassRealm pluginRealm;
-			// pluginRealm = this.buildPluginManager.getPluginRealm(this.mvnSession,
-			// descriptor);
-			this.pluginManager.setupPluginRealm(descriptor, this.mvnSession, null, null, null);
-			pluginRealm = descriptor.getClassRealm();
-
-			getLog().warn("POST_Components:");
-			for (ComponentDescriptor<?> cDescriptor : descriptor.getComponents()) {
-				getLog().error(cDescriptor.getRole());
-			}
-
-			// getLog().warn("Realm:");
-			// for (URL url : pluginRealm.getURLs()) {
-			// getLog().error(url.getFile());
-			// }
-			// if we are unable to detect if the interface <IReferenceScanner> is
-			// implemented via plexus throw it all into the PackageScanner and scan it this
-			// way -> it will find it as long as the file exists
-		} catch (PluginResolutionException | PluginManagerException | PluginDescriptorParsingException
-				| InvalidPluginDescriptorException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static <T> List<ComponentDescriptor<T>> getComponentDescriptorList(final PlexusContainer container,
-			final ClassRealm realm, Class<T> type, String role) {
-		synchronized (container) {
-			ClassRealm oldLookupRealm = container.setLookupRealm(realm);
-			ClassLoader oldClassLoader = Thread.currentThread()
-					.getContextClassLoader();
-			Thread.currentThread()
-					.setContextClassLoader(realm);
-			try {
-				return container.getComponentDescriptorList(type, role);
-			} finally {
-				Thread.currentThread()
-						.setContextClassLoader(oldClassLoader);
-				container.setLookupRealm(oldLookupRealm);
-			}
-		}
-	}
-
-	public static boolean hasComponent(final PlexusContainer container, final ClassRealm realm, Class<?> type,
-			ClassRealm... excludedRealms) {
-		Set<ComponentDescriptor<?>> excluded = new LinkedHashSet<>();
-		for (ClassRealm excludedRealm : excludedRealms) {
-			if (realm == excludedRealm)
-				return false;
-			excluded.addAll(getComponentDescriptorList(container, excludedRealm, type, null));
-		}
-		return !excluded.containsAll(getComponentDescriptorList(container, realm, type, null));
-	}
-
 	private void analyzeScanner() {
 		// forceload all build plugins
 		// maybe later only load plugins which are active in current lifecycle
 		// execution?
-		for (Plugin mvnPlugin : this.mvnProject.getBuildPlugins()) {
-			analyzeScanner(mvnPlugin);
-		}
+		ClassRealm apiRealm = this.classRealmManager.getMavenApiRealm();
 
-		ClassRealm currentRealm = (ClassRealm) Thread.currentThread()
-				.getContextClassLoader();
-		currentRealm.display();
-		getLog().info("");
+		for (Plugin mvnPlugin : this.mvnProject.getBuildPlugins())
+			try {
 
-		getLog().info("API");
-		for (ComponentDescriptor<?> c : getComponentDescriptorList(container, this.classRealmManager.getMavenApiRealm(),
-				IReferenceScanner.class, null)) {
-			getLog().warn(c.getImplementation());
-		}
-		getLog().info("");
+				PluginDescriptor descriptor = this.pluginManager.getPluginDescriptor(mvnPlugin,
+						this.mvnProject.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
 
-		ClassWorld classWorld = currentRealm.getWorld();
-		for (ClassRealm pluginRealm : classWorld.getRealms()) {
+				this.pluginManager.setupPluginRealm(descriptor, this.mvnSession, null, null, null);
+				ClassRealm pluginRealm = descriptor.getClassRealm();
 
-			if (hasComponent(this.container, pluginRealm, IReferenceScanner.class,
-					this.classRealmManager.getMavenApiRealm()))
-				getLog().warn(pluginRealm.getId());
+				if (!hasComponent(container, pluginRealm, IReferenceScanner.class, apiRealm))
+					continue;
 
-		}
+				this.refScanner.putAll(lookupMap(this.container, pluginRealm, IReferenceScanner.class));
+
+			} catch (PluginResolutionException | PluginManagerException | PluginDescriptorParsingException
+					| InvalidPluginDescriptorException | ComponentLookupException e) {
+				e.printStackTrace();
+			}
+
 	}
 }

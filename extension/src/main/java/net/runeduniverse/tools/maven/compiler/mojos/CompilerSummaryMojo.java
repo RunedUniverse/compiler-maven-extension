@@ -7,7 +7,7 @@ import org.apache.maven.plugin.MojoFailureException;
 /**
  * Summarizes a forked builder lifecycle
  * 
- * @author Pl4yingNight
+ * @author VenaNocta
  * @goal compiler-summary
  */
 public class CompilerSummaryMojo extends AbstractMojo {

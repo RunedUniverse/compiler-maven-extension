@@ -5,7 +5,7 @@
 		<!-- compiler-maven-extension -->
 		<exportedPackage>net.runeduniverse.tools.maven.compiler.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.compiler.api.mojo
+		<exportedPackage>net.runeduniverse.tools.maven.compiler.api.mojos
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.compiler.mojos
 		</exportedPackage>
@@ -18,7 +18,7 @@
 	</exportedPackages>
 
 	<exportedArtifacts>
-		<!-- r4m-maven-extension -->
+		<!-- compiler-maven-extension -->
 		<exportedArtifact>net.runeduniverse.tools.maven.compiler:compiler-api
 		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.tools.maven.compiler:compiler-maven-extension
