@@ -30,6 +30,24 @@ public interface ContextUtils {
 		}
 	}
 
+	public static <T> Map<String, ComponentDescriptor<T>> getComponentDescriptorMap(final PlexusContainer container,
+			final ClassRealm realm, Class<T> type, String role) {
+		synchronized (container) {
+			ClassRealm oldLookupRealm = container.setLookupRealm(realm);
+			ClassLoader oldClassLoader = Thread.currentThread()
+					.getContextClassLoader();
+			Thread.currentThread()
+					.setContextClassLoader(realm);
+			try {
+				return container.getComponentDescriptorMap(type, role);
+			} finally {
+				Thread.currentThread()
+						.setContextClassLoader(oldClassLoader);
+				container.setLookupRealm(oldLookupRealm);
+			}
+		}
+	}
+
 	public static boolean hasComponent(final PlexusContainer container, final ClassRealm realm, Class<?> type,
 			ClassRealm... excludedRealms) {
 		Set<ComponentDescriptor<?>> excluded = new LinkedHashSet<>();
@@ -41,16 +59,17 @@ public interface ContextUtils {
 		return !excluded.containsAll(getComponentDescriptorList(container, realm, type, null));
 	}
 
-	public static <T> Map<String, T> lookupMap(final PlexusContainer container, final ClassRealm realm,
-			final Class<T> type) throws ComponentLookupException {
+	public static <T> void loadComponent(final PlexusContainer container, ComponentDescriptor<T> descriptor,
+			ComponentHandler<T> handler) throws ComponentLookupException {
 		synchronized (container) {
-			ClassRealm oldLookupRealm = container.setLookupRealm(realm);
+			ClassRealm oldLookupRealm = container.setLookupRealm(descriptor.getRealm());
 			ClassLoader oldClassLoader = Thread.currentThread()
 					.getContextClassLoader();
 			Thread.currentThread()
-					.setContextClassLoader(realm);
+					.setContextClassLoader(descriptor.getRealm());
 			try {
-				return container.lookupMap(type);
+				handler.accept(container, container.lookup(descriptor.getImplementationClass(), descriptor.getRole(),
+						descriptor.getRoleHint()));
 			} finally {
 				Thread.currentThread()
 						.setContextClassLoader(oldClassLoader);
@@ -59,13 +78,11 @@ public interface ContextUtils {
 		}
 	}
 
-	public static <T> Map<String, T> lookupMapOrDefault(final PlexusContainer container, final ClassRealm realm,
-			final Class<T> type, final Map<String, T> defaultValue) {
-		try {
-			return lookupMap(container, realm, type);
-		} catch (ComponentLookupException e) {
-			return defaultValue;
-		}
+	@FunctionalInterface
+	public interface ComponentHandler<T> {
+
+		public void accept(final PlexusContainer container, final T instance);
+
 	}
 
 }

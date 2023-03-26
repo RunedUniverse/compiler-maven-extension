@@ -1,6 +1,7 @@
 package net.runeduniverse.tools.maven.compiler.mojos;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
@@ -18,6 +19,7 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
@@ -25,7 +27,8 @@ import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
 import net.runeduniverse.tools.maven.compiler.api.IRuntimeScanner;
 
 import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.hasComponent;
-import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.lookupMap;
+import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.getComponentDescriptorMap;
+import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.loadComponent;
 
 /**
  * Maps out all references of the source files to later be able to compile
@@ -104,10 +107,8 @@ public class ScanReferencesMojo extends AbstractMojo {
 	 * @component role="net.runeduniverse.tools.maven.compiler.api.IRuntimeScanner"
 	 */
 	private Map<String, IRuntimeScanner> runtimeScannerMap;
-	/**
-	 * @component role="net.runeduniverse.tools.maven.compiler.api.IReferenceScanner"
-	 */
-	private Map<String, IReferenceScanner> refScanner;
+
+	private Map<String, ComponentDescriptor<IReferenceScanner>> refScanner = new LinkedHashMap<>();
 
 	private IRuntimeScanner runtimeScanner;
 
@@ -128,43 +129,51 @@ public class ScanReferencesMojo extends AbstractMojo {
 
 		this.analyzeScanner();
 
-		getLog().info("");
-
 		getLog().info("mapping references of source-files");
-		for (IReferenceScanner scanner : this.refScanner.values()) {
-			scanner.logInfo(getLog());
+		for (ComponentDescriptor<IReferenceScanner> descriptor : this.refScanner.values()) {
+			try {
+				loadComponent(this.container, descriptor, (c, scanner) -> {
+					scanner.logInfo(getLog());
+				});
+			} catch (ComponentLookupException e) {
+				getLog().error(e);
+			}
 		}
+		getLog().info("");
 		// TODO collect collectors from compiler plugins and run those
-		for (IReferenceScanner scanner : this.refScanner.values()) {
-			scanner.logAnalisis(getLog());
+		for (ComponentDescriptor<IReferenceScanner> descriptor : this.refScanner.values()) {
+			try {
+				loadComponent(this.container, descriptor, (c, scanner) -> {
+					scanner.logAnalisis(getLog());
+				});
+			} catch (ComponentLookupException e) {
+				getLog().error(e);
+			}
 		}
 		getLog().info("finished mapping references of source-files");
 	}
 
 	private void analyzeScanner() {
-		// forceload all build plugins
-		// maybe later only load plugins which are active in current lifecycle
-		// execution?
 		ClassRealm apiRealm = this.classRealmManager.getMavenApiRealm();
 
 		for (Plugin mvnPlugin : this.mvnProject.getBuildPlugins())
 			try {
-
 				PluginDescriptor descriptor = this.pluginManager.getPluginDescriptor(mvnPlugin,
 						this.mvnProject.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
-
+				// forceload all build plugins
 				this.pluginManager.setupPluginRealm(descriptor, this.mvnSession, null, null, null);
 				ClassRealm pluginRealm = descriptor.getClassRealm();
 
 				if (!hasComponent(container, pluginRealm, IReferenceScanner.class, apiRealm))
 					continue;
 
-				this.refScanner.putAll(lookupMap(this.container, pluginRealm, IReferenceScanner.class));
+				this.refScanner.putAll(getComponentDescriptorMap(this.container, pluginRealm, null,
+						IReferenceScanner.class.getCanonicalName()));
 
 			} catch (PluginResolutionException | PluginManagerException | PluginDescriptorParsingException
-					| InvalidPluginDescriptorException | ComponentLookupException e) {
-				e.printStackTrace();
+					| InvalidPluginDescriptorException e) {
+				getLog().error(e);
 			}
-
 	}
+
 }
