@@ -186,40 +186,31 @@ public class ScanReferencesMojo extends AbstractMojo {
 
 	private void buildRealm() {
 		getLog().warn("rebuilding REALM");
-		
-		ClassRealm curRealm = (ClassRealm) Thread.currentThread().getContextClassLoader();
+
+		ClassRealm curRealm = (ClassRealm) Thread.currentThread()
+				.getContextClassLoader();
 		ClassWorld world = curRealm.getWorld();
-		
+
 		Map<ClassRealm, CompoundTree> treeMap = new LinkedHashMap<>();
 		Set<ClassRealm> rootlessRealms = new LinkedHashSet<>();
-		
-		getLog().info("Loaded Realms:");
-		
-		
-		
+
 		for (ClassRealm realm : world.getRealms()) {
-			
-			CompoundTree t = new CompoundTree("TREE", realm.getId());
+			CompoundTree t = new CompoundTree(realm.getId());
 			treeMap.put(realm, t);
 			rootlessRealms.add(realm);
 		}
-		
 		for (ClassRealm r : treeMap.keySet()) {
 			CompoundTree t = treeMap.get(r.getParentClassLoader());
-			if(t==null)
+			if (t == null)
 				continue;
 			t.append(treeMap.get(r));
 			rootlessRealms.remove(r);
 		}
-		
-		for (ClassRealm r : rootlessRealms) {
-			getLog().info(treeMap.get(r).toString());
-		}
-		
-		
-		
-		
-		
+		CompoundTree loadedRealmsTree = new CompoundTree("Loaded Realms");
+		for (ClassRealm r : rootlessRealms)
+			loadedRealmsTree.append(treeMap.get(r));
+		getLog().info(loadedRealmsTree.toString());
+
 		
 		
 		
