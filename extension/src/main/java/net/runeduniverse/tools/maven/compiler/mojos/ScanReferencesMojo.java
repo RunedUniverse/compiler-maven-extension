@@ -2,7 +2,10 @@ package net.runeduniverse.tools.maven.compiler.mojos;
 
 import java.io.File;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
@@ -18,10 +21,12 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
 import net.runeduniverse.tools.maven.compiler.api.IRuntimeScanner;
@@ -151,6 +156,9 @@ public class ScanReferencesMojo extends AbstractMojo {
 			}
 		}
 		getLog().info("finished mapping references of source-files");
+
+		// debug:
+		this.buildRealm();
 	}
 
 	private void analyzeScanner() {
@@ -174,6 +182,55 @@ public class ScanReferencesMojo extends AbstractMojo {
 					| InvalidPluginDescriptorException e) {
 				getLog().error(e);
 			}
+	}
+
+	private void buildRealm() {
+		getLog().warn("rebuilding REALM");
+		
+		ClassRealm curRealm = (ClassRealm) Thread.currentThread().getContextClassLoader();
+		ClassWorld world = curRealm.getWorld();
+		
+		Map<ClassRealm, CompoundTree> treeMap = new LinkedHashMap<>();
+		Set<ClassRealm> rootlessRealms = new LinkedHashSet<>();
+		
+		getLog().info("Loaded Realms:");
+		
+		
+		
+		for (ClassRealm realm : world.getRealms()) {
+			
+			CompoundTree t = new CompoundTree("TREE", realm.getId());
+			treeMap.put(realm, t);
+			rootlessRealms.add(realm);
+		}
+		
+		for (ClassRealm r : treeMap.keySet()) {
+			CompoundTree t = treeMap.get(r.getParentClassLoader());
+			if(t==null)
+				continue;
+			t.append(treeMap.get(r));
+			rootlessRealms.remove(r);
+		}
+		
+		for (ClassRealm r : rootlessRealms) {
+			getLog().info(treeMap.get(r).toString());
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	}
 
 }
