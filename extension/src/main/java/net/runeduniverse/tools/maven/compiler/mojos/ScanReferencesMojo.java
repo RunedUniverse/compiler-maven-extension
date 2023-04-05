@@ -1,13 +1,18 @@
 package net.runeduniverse.tools.maven.compiler.mojos;
 
 import java.io.File;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.extension.internal.CoreExports;
+import org.apache.maven.extension.internal.CoreExportsProvider;
+import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -23,6 +28,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
@@ -206,6 +212,26 @@ public class ScanReferencesMojo extends AbstractMojo {
 		return loadedRealmsTree;
 	}
 
+	private ClassRealm buildCompilerBuildRealm(final ClassWorld world, final ClassRealm parentRealm) {
+		String ID = "build>net.runeduniverse.tools.maven.compiler:compiler-maven-extension";
+		ClassRealm compilerBuildRealm;
+		try {
+			compilerBuildRealm = world.newRealm(ID, null);
+		} catch (DuplicateRealmException e) {
+			return world.getClassRealm(ID);
+		}
+
+		compilerBuildRealm.setParentRealm(parentRealm);
+
+		CoreExports exports = new CoreExports(CoreExtensionEntry.discoverFrom(world.getClassRealm("plexus.core")));
+		for (Entry<String, ClassLoader> entry : exports.getExportedPackages()
+				.entrySet()) {
+			getLog().warn("ID: " + entry.getKey() + "\tCL: " + entry.getValue());
+		}
+
+		return compilerBuildRealm;
+	}
+
 	private void buildRealm() {
 		getLog().warn("rebuilding REALM");
 
@@ -215,32 +241,9 @@ public class ScanReferencesMojo extends AbstractMojo {
 
 		getLog().info(toTree(world).toString());
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+		ClassRealm compilerBuildRealm = this.buildCompilerBuildRealm(world, curRealm);
+
+		getLog().info(toTree(world).toString());
 	}
 
 }
