@@ -184,13 +184,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 			}
 	}
 
-	private void buildRealm() {
-		getLog().warn("rebuilding REALM");
-
-		ClassRealm curRealm = (ClassRealm) Thread.currentThread()
-				.getContextClassLoader();
-		ClassWorld world = curRealm.getWorld();
-
+	private static CompoundTree toTree(ClassWorld world) {
 		Map<ClassRealm, CompoundTree> treeMap = new LinkedHashMap<>();
 		Set<ClassRealm> rootlessRealms = new LinkedHashSet<>();
 
@@ -206,11 +200,36 @@ public class ScanReferencesMojo extends AbstractMojo {
 			t.append(treeMap.get(r));
 			rootlessRealms.remove(r);
 		}
-		CompoundTree loadedRealmsTree = new CompoundTree("Loaded Realms");
+		CompoundTree loadedRealmsTree = new CompoundTree("ClassWorld");
 		for (ClassRealm r : rootlessRealms)
 			loadedRealmsTree.append(treeMap.get(r));
-		getLog().info(loadedRealmsTree.toString());
+		return loadedRealmsTree;
+	}
 
+	private void buildRealm() {
+		getLog().warn("rebuilding REALM");
+
+		ClassRealm curRealm = (ClassRealm) Thread.currentThread()
+				.getContextClassLoader();
+		ClassWorld world = curRealm.getWorld();
+
+		getLog().info(toTree(world).toString());
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		
