@@ -21,7 +21,9 @@
 					<phase>pre-linker</phase>
 					<phase>linker</phase>
 					<phase>post-linker</phase>
-					<phase>package-binary</phase>
+					<phase>pre-pack-binary</phase>
+					<phase>pack-binary</phase>
+					<phase>post-pack-binary</phase>
 				</phases>
 			</configuration>
 		</component>

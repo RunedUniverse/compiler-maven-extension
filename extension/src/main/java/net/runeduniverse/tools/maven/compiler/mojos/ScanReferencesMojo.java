@@ -1,7 +1,6 @@
 package net.runeduniverse.tools.maven.compiler.mojos;
 
 import java.io.File;
-import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -11,7 +10,6 @@ import java.util.Set;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.extension.internal.CoreExports;
-import org.apache.maven.extension.internal.CoreExportsProvider;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
@@ -31,13 +29,14 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
 import net.runeduniverse.tools.maven.compiler.api.IExecutionMapper;
 
-import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.hasComponent;
+import static net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils.getContext;
+import static net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils.putContext;
+import static net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils.releaseComponent;
 import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.getComponentDescriptorMap;
 import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.loadComponent;
 
@@ -111,6 +110,10 @@ public class ScanReferencesMojo extends AbstractMojo {
 	 */
 	private MavenPluginManager pluginManager;
 
+	// RUNTIME CONTEXT
+
+	private Map<String, ICompilerRuntime> compilerRuntimeContext = new LinkedHashMap<>(0);
+
 	// RUNTIME PLEXUS COMPONENTS
 
 	private Map<String, ComponentDescriptor<IExecutionMapper>> executionMapperDescriptors = new LinkedHashMap<>(2);
@@ -125,6 +128,12 @@ public class ScanReferencesMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+
+		// load context
+		compilerRuntimeContext = getContext(this.mvnSession, ICompilerRuntime.class);
+		if (compilerRuntimeContext == null)
+			compilerRuntimeContext = new LinkedHashMap<String, ICompilerRuntime>();
+		putContext(this.mvnSession, ICompilerRuntime.class, compilerRuntimeContext);
 
 		// seed with defaults
 		executionMapperDescriptors
@@ -155,8 +164,10 @@ public class ScanReferencesMojo extends AbstractMojo {
 
 		// initialize ICompilerRuntime
 		this.runtime = this.executionMapper.createRuntime();
-		this.container.addComponent(this.runtime, ICompilerRuntime.class, this.runtime.getHint());
+		releaseComponent(this.mvnSession, ICompilerRuntime.class,
+				this.compilerRuntimeContext.put(this.runtime.getHint(), this.runtime));
 
+		// scan
 		getLog().info("mapping references of source-files");
 		for (ComponentDescriptor<IReferenceScanner> descriptor : this.referenceScannerDescriptors.values()) {
 			try {
