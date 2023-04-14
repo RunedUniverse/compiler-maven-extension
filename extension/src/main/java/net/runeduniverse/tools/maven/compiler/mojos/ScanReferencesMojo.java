@@ -164,7 +164,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 		getLog().info("finished mapping references of source-files");
 
 		// debug:
-		this.buildRealm();
+		// this.buildRealm();
 	}
 
 	private void analyzeScanner() {
