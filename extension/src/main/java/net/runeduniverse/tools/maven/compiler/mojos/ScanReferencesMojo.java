@@ -35,7 +35,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
-import net.runeduniverse.tools.maven.compiler.api.IRuntimeScanner;
+import net.runeduniverse.tools.maven.compiler.api.IExecutionMapper;
 
 import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.hasComponent;
 import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.getComponentDescriptorMap;
@@ -110,38 +110,55 @@ public class ScanReferencesMojo extends AbstractMojo {
 	 * @component
 	 */
 	private MavenPluginManager pluginManager;
-	/**
-	 * @component
-	 */
+
+	// RUNTIME PLEXUS COMPONENTS
+
+	private Map<String, ComponentDescriptor<IExecutionMapper>> executionMapperDescriptors = new LinkedHashMap<>(2);
+
+	private Map<String, ComponentDescriptor<IReferenceScanner>> referenceScannerDescriptors = new LinkedHashMap<>();
+
+	// RUNTIME VALUES
+
+	private IExecutionMapper executionMapper;
+
 	private ICompilerRuntime runtime;
-	/**
-	 * @component role="net.runeduniverse.tools.maven.compiler.api.IRuntimeScanner"
-	 */
-	private Map<String, IRuntimeScanner> runtimeScannerMap;
-
-	private Map<String, ComponentDescriptor<IReferenceScanner>> refScanner = new LinkedHashMap<>();
-
-	private IRuntimeScanner runtimeScanner;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
-		// select IRuntimeScanner
-		this.runtimeScanner = this.runtimeScannerMap.get(this.mojoExecution.getExecutionId());
-		if (this.runtimeScanner == null)
-			this.runtimeScanner = this.runtimeScannerMap.get("default");
+		// seed with defaults
+		executionMapperDescriptors
+				.putAll(this.container.getComponentDescriptorMap(null, IExecutionMapper.class.getCanonicalName()));
+		// seed with build plugins
+		this.scanBuildPlugins();
 
-		// initialize ICompilerRuntime
-		if (this.runtimeScanner.isTestExecution()) {
-			this.runtime.initialize(this.testSourceDirectory, this.testTargetDirectory);
-		} else {
-			this.runtime.initialize(this.sourceDirectory, this.targetDirectory);
+		// select IExecutionMapper
+		ComponentDescriptor<IExecutionMapper> executionMapperDescriptor = this.executionMapperDescriptors
+				.get(this.mojoExecution.getExecutionId());
+		if (executionMapperDescriptor == null)
+			executionMapperDescriptor = executionMapperDescriptors.get("default");
+
+		try {
+			loadComponent(this.container, executionMapperDescriptor, (context, executionMapper) -> {
+				ScanReferencesMojo.this.executionMapper = executionMapper;
+			});
+		} catch (ComponentLookupException e) {
+			throw new MojoExecutionException(
+					"IExecutionMapper<" + executionMapperDescriptor.getImplementation() + "> failed to load!", e);
 		}
 
-		this.analyzeScanner();
+		// seed mapper
+		this.executionMapper.setSourceDirectory(this.sourceDirectory)
+				.setTargetDirectory(this.targetDirectory)
+				.setTestSourceDirectory(this.testSourceDirectory)
+				.setTestTargetDirectory(this.testTargetDirectory);
+
+		// initialize ICompilerRuntime
+		this.runtime = this.executionMapper.createRuntime();
+		this.container.addComponent(this.runtime, ICompilerRuntime.class, this.runtime.getHint());
 
 		getLog().info("mapping references of source-files");
-		for (ComponentDescriptor<IReferenceScanner> descriptor : this.refScanner.values()) {
+		for (ComponentDescriptor<IReferenceScanner> descriptor : this.referenceScannerDescriptors.values()) {
 			try {
 				loadComponent(this.container, descriptor, (c, scanner) -> {
 					scanner.logInfo(getLog());
@@ -152,7 +169,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 		}
 		getLog().info("");
 		// TODO collect collectors from compiler plugins and run those
-		for (ComponentDescriptor<IReferenceScanner> descriptor : this.refScanner.values()) {
+		for (ComponentDescriptor<IReferenceScanner> descriptor : this.referenceScannerDescriptors.values()) {
 			try {
 				loadComponent(this.container, descriptor, (c, scanner) -> {
 					scanner.logAnalisis(getLog());
@@ -167,7 +184,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 		// this.buildRealm();
 	}
 
-	private void analyzeScanner() {
+	private void scanBuildPlugins() {
 		ClassRealm apiRealm = this.classRealmManager.getMavenApiRealm();
 
 		for (Plugin mvnPlugin : this.mvnProject.getBuildPlugins())
@@ -178,11 +195,11 @@ public class ScanReferencesMojo extends AbstractMojo {
 				this.pluginManager.setupPluginRealm(descriptor, this.mvnSession, null, null, null);
 				ClassRealm pluginRealm = descriptor.getClassRealm();
 
-				if (!hasComponent(container, pluginRealm, IReferenceScanner.class, apiRealm))
-					continue;
-
-				this.refScanner.putAll(getComponentDescriptorMap(this.container, pluginRealm, null,
+				this.referenceScannerDescriptors.putAll(getComponentDescriptorMap(this.container, pluginRealm, null,
 						IReferenceScanner.class.getCanonicalName()));
+
+				this.executionMapperDescriptors.putAll(getComponentDescriptorMap(this.container, pluginRealm, null,
+						IExecutionMapper.class.getCanonicalName()));
 
 			} catch (PluginResolutionException | PluginManagerException | PluginDescriptorParsingException
 					| InvalidPluginDescriptorException e) {

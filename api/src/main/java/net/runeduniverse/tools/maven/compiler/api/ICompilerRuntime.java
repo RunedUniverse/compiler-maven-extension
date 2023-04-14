@@ -4,7 +4,11 @@ import java.io.File;
 
 public interface ICompilerRuntime {
 
-	public void initialize(final File sourceDirectory, final File targetDirectory);
+	public static final String DEFAULT_HINT = "default";
+
+	public default String getHint() {
+		return ICompilerRuntime.DEFAULT_HINT;
+	}
 
 	public File getSourceDirectory();
 
