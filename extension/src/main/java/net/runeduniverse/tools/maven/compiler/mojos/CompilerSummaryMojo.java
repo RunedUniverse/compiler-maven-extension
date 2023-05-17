@@ -14,7 +14,6 @@ public class CompilerSummaryMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		// TODO Auto-generated method stub
 
 	}
 

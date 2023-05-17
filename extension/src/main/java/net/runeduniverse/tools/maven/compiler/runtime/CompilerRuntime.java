@@ -4,8 +4,6 @@ import java.io.File;
 
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
 
-// gets injected into plexus-container!
-// @Component(role = ICompilerRuntime.class, hint = "default", instantiationStrategy = "singleton")
 public class CompilerRuntime implements ICompilerRuntime {
 
 	private File sourceDirectory;
