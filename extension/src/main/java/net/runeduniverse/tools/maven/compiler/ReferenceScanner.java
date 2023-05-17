@@ -20,13 +20,15 @@ public class ReferenceScanner implements IReferenceScanner {
 	@Requirement
 	private MavenSession mvnSession;
 
+	protected Log log;
 	protected ICompilerRuntime runtime;
 
 	public ReferenceScanner() {
 	}
 
 	@Override
-	public boolean logInfo(Log log) {
+	public boolean scan() {
+		this.log = CurrentContextUtils.lookupComponent(this.mvnSession, Log.class);
 		this.runtime = CurrentContextUtils.lookupComponent(this.mvnSession, ICompilerRuntime.class);
 
 		log.info("SourceDirectory: " + this.runtime.getSourceDirectory());

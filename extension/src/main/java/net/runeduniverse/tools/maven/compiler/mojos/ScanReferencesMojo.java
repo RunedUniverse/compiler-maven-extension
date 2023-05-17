@@ -22,6 +22,7 @@ import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -34,6 +35,7 @@ import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
 import net.runeduniverse.tools.maven.compiler.api.IExecutionMapper;
 
+import static net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils.addComponent;
 import static net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils.getContext;
 import static net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils.putContext;
 import static net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils.releaseComponent;
@@ -129,6 +131,8 @@ public class ScanReferencesMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
+		addComponent(mvnSession, Log.class, "default", getLog());
+
 		// load context
 		compilerRuntimeContext = getContext(this.mvnSession, ICompilerRuntime.class);
 		if (compilerRuntimeContext == null)
@@ -157,10 +161,8 @@ public class ScanReferencesMojo extends AbstractMojo {
 		}
 
 		// seed mapper
-		this.executionMapper.setSourceDirectory(this.sourceDirectory)
-				.setTargetDirectory(this.targetDirectory)
-				.setTestSourceDirectory(this.testSourceDirectory)
-				.setTestTargetDirectory(this.testTargetDirectory);
+		this.executionMapper.setSourceDirectory(this.sourceDirectory).setTargetDirectory(this.targetDirectory)
+				.setTestSourceDirectory(this.testSourceDirectory).setTestTargetDirectory(this.testTargetDirectory);
 
 		// initialize ICompilerRuntime
 		this.runtime = this.executionMapper.createRuntime();
@@ -172,7 +174,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 		for (ComponentDescriptor<IReferenceScanner> descriptor : this.referenceScannerDescriptors.values()) {
 			try {
 				loadComponent(this.container, descriptor, (c, scanner) -> {
-					scanner.logInfo(getLog());
+					scanner.scan();
 				});
 			} catch (ComponentLookupException e) {
 				getLog().error(e);
@@ -252,8 +254,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 		compilerBuildRealm.setParentRealm(parentRealm);
 
 		CoreExports exports = new CoreExports(CoreExtensionEntry.discoverFrom(world.getClassRealm("plexus.core")));
-		for (Entry<String, ClassLoader> entry : exports.getExportedPackages()
-				.entrySet()) {
+		for (Entry<String, ClassLoader> entry : exports.getExportedPackages().entrySet()) {
 			getLog().warn("ID: " + entry.getKey() + "\tCL: " + entry.getValue());
 		}
 
@@ -263,8 +264,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 	private void buildRealm() {
 		getLog().warn("rebuilding REALM");
 
-		ClassRealm curRealm = (ClassRealm) Thread.currentThread()
-				.getContextClassLoader();
+		ClassRealm curRealm = (ClassRealm) Thread.currentThread().getContextClassLoader();
 		ClassWorld world = curRealm.getWorld();
 
 		getLog().info(toTree(world).toString());
