@@ -5,7 +5,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
- * Summarizes a forked builder lifecycle
+ * Summarizes a forked compiler lifecycle
  * 
  * @author VenaNocta
  * @goal compiler-summary
