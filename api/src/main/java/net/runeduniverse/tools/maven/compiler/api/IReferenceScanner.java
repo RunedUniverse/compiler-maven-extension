@@ -4,6 +4,8 @@ import org.apache.maven.plugin.logging.Log;
 
 public interface IReferenceScanner {
 
+	public void identifyNodes();
+
 	public boolean scan();
 
 	public boolean logAnalisis(Log log);
