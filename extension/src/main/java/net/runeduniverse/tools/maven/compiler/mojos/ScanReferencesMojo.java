@@ -1,5 +1,12 @@
 package net.runeduniverse.tools.maven.compiler.mojos;
 
+import static net.runeduniverse.tools.maven.compiler.mojos.api.ContextUtils.getComponentDescriptorMap;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.ContextUtils.loadComponent;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.CurrentContextUtils.addComponent;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.CurrentContextUtils.getContext;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.CurrentContextUtils.putContext;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.CurrentContextUtils.releaseComponent;
+
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -34,13 +41,6 @@ import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
 import net.runeduniverse.tools.maven.compiler.api.IExecutionMapper;
-
-import static net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils.addComponent;
-import static net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils.getContext;
-import static net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils.putContext;
-import static net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils.releaseComponent;
-import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.getComponentDescriptorMap;
-import static net.runeduniverse.tools.maven.compiler.api.mojos.ContextUtils.loadComponent;
 
 /**
  * Maps out all references of the source files to later be able to compile

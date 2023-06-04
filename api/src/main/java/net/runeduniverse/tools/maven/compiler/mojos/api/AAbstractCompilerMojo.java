@@ -1,8 +1,7 @@
-package net.runeduniverse.tools.maven.compiler.api.mojos;
+package net.runeduniverse.tools.maven.compiler.mojos.api;
 
 import org.apache.maven.plugin.AbstractMojo;
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
-import net.runeduniverse.tools.maven.compiler.api.IReferenceMap;
 
 public abstract class AAbstractCompilerMojo extends AbstractMojo {
 
@@ -11,8 +10,4 @@ public abstract class AAbstractCompilerMojo extends AbstractMojo {
 	 */
 	protected ICompilerRuntime runtime;
 
-	/**
-	 * @component
-	 */
-	protected IReferenceMap references;
 }

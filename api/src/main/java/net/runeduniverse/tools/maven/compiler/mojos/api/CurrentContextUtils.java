@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.maven.compiler.api.mojos;
+package net.runeduniverse.tools.maven.compiler.mojos.api;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;

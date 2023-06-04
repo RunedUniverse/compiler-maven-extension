@@ -8,7 +8,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceMap;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
-import net.runeduniverse.tools.maven.compiler.api.mojos.CurrentContextUtils;
+import net.runeduniverse.tools.maven.compiler.mojos.api.CurrentContextUtils;
 
 @Component(role = IReferenceScanner.class, hint = ReferenceScanner.HINT)
 public class ReferenceScanner implements IReferenceScanner {
