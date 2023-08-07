@@ -161,14 +161,28 @@ public class ScanReferencesMojo extends AbstractMojo {
 		}
 
 		// seed mapper
-		this.executionMapper.setSourceDirectory(this.sourceDirectory).setTargetDirectory(this.targetDirectory)
-				.setTestSourceDirectory(this.testSourceDirectory).setTestTargetDirectory(this.testTargetDirectory);
+		this.executionMapper.setSourceDirectory(this.sourceDirectory)
+				.setTargetDirectory(this.targetDirectory)
+				.setTestSourceDirectory(this.testSourceDirectory)
+				.setTestTargetDirectory(this.testTargetDirectory);
 
 		// initialize ICompilerRuntime
 		this.runtime = this.executionMapper.createRuntime();
 		releaseComponent(this.mvnSession, ICompilerRuntime.class,
 				this.compilerRuntimeContext.put(this.runtime.getHint(), this.runtime));
 
+		// identifyNodes
+		getLog().info("identifying lifecycle process nodes");
+		for (ComponentDescriptor<IReferenceScanner> descriptor : this.referenceScannerDescriptors.values()) {
+			try {
+				loadComponent(this.container, descriptor, (c, scanner) -> {
+					scanner.identifyNodes();
+				});
+			} catch (ComponentLookupException e) {
+				getLog().error(e);
+			}
+		}
+		getLog().info("");
 		// scan
 		getLog().info("mapping references of source-files");
 		for (ComponentDescriptor<IReferenceScanner> descriptor : this.referenceScannerDescriptors.values()) {
@@ -254,7 +268,8 @@ public class ScanReferencesMojo extends AbstractMojo {
 		compilerBuildRealm.setParentRealm(parentRealm);
 
 		CoreExports exports = new CoreExports(CoreExtensionEntry.discoverFrom(world.getClassRealm("plexus.core")));
-		for (Entry<String, ClassLoader> entry : exports.getExportedPackages().entrySet()) {
+		for (Entry<String, ClassLoader> entry : exports.getExportedPackages()
+				.entrySet()) {
 			getLog().warn("ID: " + entry.getKey() + "\tCL: " + entry.getValue());
 		}
 
@@ -264,7 +279,8 @@ public class ScanReferencesMojo extends AbstractMojo {
 	private void buildRealm() {
 		getLog().warn("rebuilding REALM");
 
-		ClassRealm curRealm = (ClassRealm) Thread.currentThread().getContextClassLoader();
+		ClassRealm curRealm = (ClassRealm) Thread.currentThread()
+				.getContextClassLoader();
 		ClassWorld world = curRealm.getWorld();
 
 		getLog().info(toTree(world).toString());
