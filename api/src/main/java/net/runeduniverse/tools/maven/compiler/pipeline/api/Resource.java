@@ -9,11 +9,17 @@ public interface Resource extends Recordable {
 
 	public File getFile();
 
+	public Collection<String> getTags();
+
 	public ResourceType getType();
 
 	public Collection<Resource> getSources();
 
 	public Collection<Resource> getImportedSources();
+
+	public Resource addTags(String... tags);
+
+	public Resource addTags(Collection<String> tags);
 
 	public Resource addSources(Resource... sources);
 
@@ -22,5 +28,7 @@ public interface Resource extends Recordable {
 	public Resource addImportedSource(Resource source);
 
 	public Resource addImportedSources(Collection<Resource> sources);
+
+	public boolean hasTag(String tag);
 
 }

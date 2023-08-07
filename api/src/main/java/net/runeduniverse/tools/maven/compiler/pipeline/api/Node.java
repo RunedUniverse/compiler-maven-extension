@@ -13,10 +13,6 @@ public interface Node extends Recordable {
 
 	public void registerResourceTypes(Collection<ResourceType> types);
 
-	public void addResource(Resource resource);
-
 	public Collection<ResourceType> getResourceTypes();
-
-	public Collection<Resource> getResources();
 
 }
