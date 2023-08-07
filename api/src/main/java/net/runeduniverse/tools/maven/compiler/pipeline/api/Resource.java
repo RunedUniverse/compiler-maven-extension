@@ -9,11 +9,15 @@ public interface Resource extends Recordable {
 
 	public File getFile();
 
-	public Resource getSource();
+	public ResourceType getType();
+
+	public Collection<Resource> getSources();
 
 	public Collection<Resource> getImportedSources();
 
-	public Resource setSource(Resource source);
+	public Resource addSources(Resource... sources);
+
+	public Resource addSources(Collection<Resource> sources);
 
 	public Resource addImportedSource(Resource source);
 

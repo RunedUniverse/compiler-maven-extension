@@ -6,10 +6,17 @@ import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public interface Node extends Recordable {
 
-	public String getTypeId();
+	// <phase>:<language>
+	public String getKey();
 
-	public Collection<Resource> getResources();
+	public void registerResourceType(ResourceType type);
+
+	public void registerResourceTypes(Collection<ResourceType> types);
 
 	public void addResource(Resource resource);
+
+	public Collection<ResourceType> getResourceTypes();
+
+	public Collection<Resource> getResources();
 
 }

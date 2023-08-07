@@ -4,6 +4,7 @@ import net.runeduniverse.tools.maven.compiler.api.CompilerProperties;
 import net.runeduniverse.tools.maven.compiler.api.MavenProperties;
 
 public interface Properties extends MavenProperties, CompilerProperties {
+
 	public static String VAL_PREFIX = "${";
 	public static String VAL_POSTFIX = "}";
 
@@ -35,4 +36,5 @@ public interface Properties extends MavenProperties, CompilerProperties {
 		public interface SISU extends MavenProperties.METAINF.SISU {
 		}
 	}
+
 }

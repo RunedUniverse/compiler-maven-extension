@@ -1,18 +1,20 @@
 package net.runeduniverse.tools.maven.compiler.pipeline.api;
 
+import java.util.Collection;
+
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public interface Pipeline extends Recordable {
 
-	// return true if already registered
-	public boolean registerNode(String typeId);
+	public Node acquireNode(String key);
 
-	public void registerNodesAsAliases(String... aliasTypeIds);
+	public void destroyNode(String key);
 
-	public Node getNode(String typeId);
+	public void destroyNode(Node node);
 
-	// lookup node by longest match
-	public Node matchNode(CharSequence typeId);
+	public ResourceType acquireType(String suffix);
+
+	public Collection<ResourceType> acquireTypes(String... suffixes);
 
 	// return true if already registered
 	public boolean registerResource(Resource resource);

@@ -6,7 +6,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
-import net.runeduniverse.tools.maven.compiler.api.IReferenceMap;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
 import net.runeduniverse.tools.maven.compiler.mojos.api.CurrentContextUtils;
 
@@ -15,8 +14,6 @@ public class ReferenceScanner implements IReferenceScanner {
 
 	public static final String HINT = "default";
 
-	@Requirement
-	protected IReferenceMap references;
 	@Requirement
 	private MavenSession mvnSession;
 
@@ -40,6 +37,12 @@ public class ReferenceScanner implements IReferenceScanner {
 	public boolean logAnalisis(Log log) {
 		// TODO Auto-generated method stub
 		return true;
+	}
+
+	@Override
+	public void identifyNodes() {
+		// TODO Auto-generated method stub
+
 	}
 
 }
