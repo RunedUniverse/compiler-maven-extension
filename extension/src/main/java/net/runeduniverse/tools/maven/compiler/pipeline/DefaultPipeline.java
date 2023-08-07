@@ -11,10 +11,12 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Node;
+import net.runeduniverse.tools.maven.compiler.pipeline.api.Phase;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Pipeline;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.PipelineFactory;
-import net.runeduniverse.tools.maven.compiler.pipeline.api.Resource;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceType;
+
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 @Component(role = Pipeline.class)
 public class DefaultPipeline implements Pipeline {
@@ -37,8 +39,18 @@ public class DefaultPipeline implements Pipeline {
 	}
 
 	@Override
+	public Node acquireNode(Phase phase, String id) {
+		return acquireNode(toKey(phase, id));
+	}
+
+	@Override
 	public void destroyNode(String key) {
 		this.nodes.remove(key);
+	}
+
+	@Override
+	public void destroyNode(Phase phase, String id) {
+		destroyNode(toKey(phase, id));
 	}
 
 	@Override
@@ -68,12 +80,6 @@ public class DefaultPipeline implements Pipeline {
 	}
 
 	@Override
-	public boolean registerResource(Resource resource) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public CompoundTree toRecord() {
 		CompoundTree nodes = new CompoundTree("nodes");
 		for (Node node : this.nodes.values())
@@ -82,6 +88,15 @@ public class DefaultPipeline implements Pipeline {
 				'[' + String.join(", ", this.resourceTypes.keySet()) + ']');
 		return new CompoundTree("Pipeline").append(nodes)
 				.append(resourceTypes);
+	}
+
+	protected static String toKey(Phase phase, String id) {
+		String phaseId = "";
+		if (phase != null && !isBlank(phase.getId()))
+			phaseId = phase.getId();
+		if (isBlank(id))
+			id = "null";
+		return phaseId + ':' + id;
 	}
 
 }

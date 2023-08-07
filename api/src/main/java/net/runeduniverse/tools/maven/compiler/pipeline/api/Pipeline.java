@@ -8,15 +8,16 @@ public interface Pipeline extends Recordable {
 
 	public Node acquireNode(String key);
 
+	public Node acquireNode(Phase phase, String id);
+
 	public void destroyNode(String key);
+
+	public void destroyNode(Phase phase, String id);
 
 	public void destroyNode(Node node);
 
 	public ResourceType acquireType(String suffix);
 
 	public Collection<ResourceType> acquireTypes(String... suffixes);
-
-	// return true if already registered
-	public boolean registerResource(Resource resource);
 
 }

@@ -29,6 +29,4 @@ public interface Resource extends Recordable {
 
 	public Resource addImportedSources(Collection<Resource> sources);
 
-	public boolean hasTag(String tag);
-
 }
