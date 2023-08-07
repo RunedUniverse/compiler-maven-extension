@@ -1,11 +1,11 @@
 package net.runeduniverse.tools.maven.compiler.mojos;
 
-import static net.runeduniverse.tools.maven.compiler.mojos.api.ContextUtils.getComponentDescriptorMap;
-import static net.runeduniverse.tools.maven.compiler.mojos.api.ContextUtils.loadComponent;
-import static net.runeduniverse.tools.maven.compiler.mojos.api.CurrentContextUtils.addComponent;
-import static net.runeduniverse.tools.maven.compiler.mojos.api.CurrentContextUtils.getContext;
-import static net.runeduniverse.tools.maven.compiler.mojos.api.CurrentContextUtils.putContext;
-import static net.runeduniverse.tools.maven.compiler.mojos.api.CurrentContextUtils.releaseComponent;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.PlexusContextUtils.getPlexusComponentDescriptorMap;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.PlexusContextUtils.loadPlexusComponent;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.addSessionComponent;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.getSessionContext;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.putSessionContext;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.releaseSessionComponent;
 
 import java.io.File;
 import java.util.LinkedHashMap;
@@ -131,13 +131,13 @@ public class ScanReferencesMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
-		addComponent(mvnSession, Log.class, "default", getLog());
+		addSessionComponent(mvnSession, Log.class, "default", getLog());
 
 		// load context
-		compilerRuntimeContext = getContext(this.mvnSession, ICompilerRuntime.class);
+		compilerRuntimeContext = getSessionContext(this.mvnSession, ICompilerRuntime.class);
 		if (compilerRuntimeContext == null)
 			compilerRuntimeContext = new LinkedHashMap<String, ICompilerRuntime>();
-		putContext(this.mvnSession, ICompilerRuntime.class, compilerRuntimeContext);
+		putSessionContext(this.mvnSession, ICompilerRuntime.class, compilerRuntimeContext);
 
 		// seed with defaults
 		executionMapperDescriptors
@@ -152,7 +152,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 			executionMapperDescriptor = executionMapperDescriptors.get("default");
 
 		try {
-			loadComponent(this.container, executionMapperDescriptor, (context, executionMapper) -> {
+			loadPlexusComponent(this.container, executionMapperDescriptor, (context, executionMapper) -> {
 				ScanReferencesMojo.this.executionMapper = executionMapper;
 			});
 		} catch (ComponentLookupException e) {
@@ -168,14 +168,14 @@ public class ScanReferencesMojo extends AbstractMojo {
 
 		// initialize ICompilerRuntime
 		this.runtime = this.executionMapper.createRuntime();
-		releaseComponent(this.mvnSession, ICompilerRuntime.class,
+		releaseSessionComponent(this.mvnSession, ICompilerRuntime.class,
 				this.compilerRuntimeContext.put(this.runtime.getHint(), this.runtime));
 
 		// identifyNodes
 		getLog().info("identifying lifecycle process nodes");
 		for (ComponentDescriptor<IReferenceScanner> descriptor : this.referenceScannerDescriptors.values()) {
 			try {
-				loadComponent(this.container, descriptor, (c, scanner) -> {
+				loadPlexusComponent(this.container, descriptor, (c, scanner) -> {
 					scanner.identifyNodes();
 				});
 			} catch (ComponentLookupException e) {
@@ -187,7 +187,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 		getLog().info("mapping references of source-files");
 		for (ComponentDescriptor<IReferenceScanner> descriptor : this.referenceScannerDescriptors.values()) {
 			try {
-				loadComponent(this.container, descriptor, (c, scanner) -> {
+				loadPlexusComponent(this.container, descriptor, (c, scanner) -> {
 					scanner.scan();
 				});
 			} catch (ComponentLookupException e) {
@@ -198,7 +198,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 		// TODO collect collectors from compiler plugins and run those
 		for (ComponentDescriptor<IReferenceScanner> descriptor : this.referenceScannerDescriptors.values()) {
 			try {
-				loadComponent(this.container, descriptor, (c, scanner) -> {
+				loadPlexusComponent(this.container, descriptor, (c, scanner) -> {
 					scanner.logAnalisis(getLog());
 				});
 			} catch (ComponentLookupException e) {
@@ -222,11 +222,11 @@ public class ScanReferencesMojo extends AbstractMojo {
 				this.pluginManager.setupPluginRealm(descriptor, this.mvnSession, null, null, null);
 				ClassRealm pluginRealm = descriptor.getClassRealm();
 
-				this.referenceScannerDescriptors.putAll(getComponentDescriptorMap(this.container, pluginRealm, null,
-						IReferenceScanner.class.getCanonicalName()));
+				this.referenceScannerDescriptors.putAll(getPlexusComponentDescriptorMap(this.container, pluginRealm,
+						null, IReferenceScanner.class.getCanonicalName()));
 
-				this.executionMapperDescriptors.putAll(getComponentDescriptorMap(this.container, pluginRealm, null,
-						IExecutionMapper.class.getCanonicalName()));
+				this.executionMapperDescriptors.putAll(getPlexusComponentDescriptorMap(this.container, pluginRealm,
+						null, IExecutionMapper.class.getCanonicalName()));
 
 			} catch (PluginResolutionException | PluginManagerException | PluginDescriptorParsingException
 					| InvalidPluginDescriptorException e) {

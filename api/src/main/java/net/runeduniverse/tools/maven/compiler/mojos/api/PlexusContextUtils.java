@@ -10,9 +10,9 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-public interface ContextUtils {
+public interface PlexusContextUtils {
 
-	public static <T> List<ComponentDescriptor<T>> getComponentDescriptorList(final PlexusContainer container,
+	public static <T> List<ComponentDescriptor<T>> getPlexusComponentDescriptorList(final PlexusContainer container,
 			final ClassRealm realm, Class<T> type, String role) {
 		synchronized (container) {
 			ClassRealm oldLookupRealm = container.setLookupRealm(realm);
@@ -30,8 +30,8 @@ public interface ContextUtils {
 		}
 	}
 
-	public static <T> Map<String, ComponentDescriptor<T>> getComponentDescriptorMap(final PlexusContainer container,
-			final ClassRealm realm, Class<T> type, String role) {
+	public static <T> Map<String, ComponentDescriptor<T>> getPlexusComponentDescriptorMap(
+			final PlexusContainer container, final ClassRealm realm, Class<T> type, String role) {
 		synchronized (container) {
 			ClassRealm oldLookupRealm = container.setLookupRealm(realm);
 			ClassLoader oldClassLoader = Thread.currentThread()
@@ -48,18 +48,18 @@ public interface ContextUtils {
 		}
 	}
 
-	public static boolean hasComponent(final PlexusContainer container, final ClassRealm realm, Class<?> type,
+	public static boolean hasPlexusComponent(final PlexusContainer container, final ClassRealm realm, Class<?> type,
 			ClassRealm... excludedRealms) {
 		Set<ComponentDescriptor<?>> excluded = new LinkedHashSet<>();
 		for (ClassRealm excludedRealm : excludedRealms) {
 			if (realm == excludedRealm)
 				return false;
-			excluded.addAll(getComponentDescriptorList(container, excludedRealm, type, null));
+			excluded.addAll(getPlexusComponentDescriptorList(container, excludedRealm, type, null));
 		}
-		return !excluded.containsAll(getComponentDescriptorList(container, realm, type, null));
+		return !excluded.containsAll(getPlexusComponentDescriptorList(container, realm, type, null));
 	}
 
-	public static <T> void loadComponent(final PlexusContainer container, ComponentDescriptor<T> descriptor,
+	public static <T> void loadPlexusComponent(final PlexusContainer container, ComponentDescriptor<T> descriptor,
 			ComponentHandler<T> handler) throws ComponentLookupException {
 		synchronized (container) {
 			ClassRealm oldLookupRealm = container.setLookupRealm(descriptor.getRealm());

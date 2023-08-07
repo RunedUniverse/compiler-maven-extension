@@ -10,10 +10,10 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.eclipse.sisu.inject.Logs;
 
-public interface CurrentContextUtils {
+public interface SessionContextUtils {
 
 	@SuppressWarnings("unchecked")
-	public static <R> Map<String, R> getContext(final MavenSession mvnSession, final Class<R> role) {
+	public static <R> Map<String, R> getSessionContext(final MavenSession mvnSession, final Class<R> role) {
 		Object obj = mvnSession.getCurrentProject()
 				.getContextValue(role.getCanonicalName());
 		if (obj == null)
@@ -25,25 +25,25 @@ public interface CurrentContextUtils {
 		}
 	}
 
-	public static <R> Map<String, R> putContext(final MavenSession mvnSession, final Class<R> role,
+	public static <R> Map<String, R> putSessionContext(final MavenSession mvnSession, final Class<R> role,
 			Map<String, R> context) {
-		Map<String, R> oldContext = getContext(mvnSession, role);
+		Map<String, R> oldContext = getSessionContext(mvnSession, role);
 		mvnSession.getCurrentProject()
 				.setContextValue(role.getCanonicalName(), context);
 		return oldContext;
 	}
 
-	public static <R> void releaseContext(final MavenSession mvnSession, final Class<R> role) {
-		Map<String, R> context = getContext(mvnSession, role);
+	public static <R> void releaseSessionContext(final MavenSession mvnSession, final Class<R> role) {
+		Map<String, R> context = getSessionContext(mvnSession, role);
 		if (context != null)
 			for (R component : context.values())
-				CurrentContextUtils.releaseComponent(mvnSession, role, component);
+				SessionContextUtils.releaseSessionComponent(mvnSession, role, component);
 		mvnSession.getCurrentProject()
 				.setContextValue(role.getCanonicalName(), null);
 	}
 
-	public static <R> R lookupComponent(final MavenSession mvnSession, final Class<R> role) {
-		Map<String, R> map = getContext(mvnSession, role);
+	public static <R> R lookupSessionComponent(final MavenSession mvnSession, final Class<R> role) {
+		Map<String, R> map = getSessionContext(mvnSession, role);
 		if (map == null)
 			return null;
 		for (Iterator<R> i = map.values()
@@ -55,26 +55,26 @@ public interface CurrentContextUtils {
 		return null;
 	}
 
-	public static <R> R lookupComponent(final MavenSession mvnSession, final Class<R> role, final String hint) {
-		Map<String, R> map = getContext(mvnSession, role);
+	public static <R> R lookupSessionComponent(final MavenSession mvnSession, final Class<R> role, final String hint) {
+		Map<String, R> map = getSessionContext(mvnSession, role);
 		if (map == null)
 			return null;
 		return map.get(hint);
 	}
 
-	public static <R, T extends R> void addComponent(final MavenSession mvnSession, final Class<R> role,
+	public static <R, T extends R> void addSessionComponent(final MavenSession mvnSession, final Class<R> role,
 			final String hint, T component) {
-		Map<String, R> map = getContext(mvnSession, role);
+		Map<String, R> map = getSessionContext(mvnSession, role);
 		if (map == null) {
 			map = new LinkedHashMap<>();
-			putContext(mvnSession, role, map);
+			putSessionContext(mvnSession, role, map);
 		}
 		map.put(hint, component);
 	}
 
-	public static <R, T extends R> void releaseComponent(final MavenSession mvnSession, final Class<R> role,
+	public static <R, T extends R> void releaseSessionComponent(final MavenSession mvnSession, final Class<R> role,
 			T component) {
-		Map<String, R> map = getContext(mvnSession, role);
+		Map<String, R> map = getSessionContext(mvnSession, role);
 		if (component != null) {
 			if (component instanceof Startable)
 				try {

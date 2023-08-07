@@ -78,9 +78,8 @@ public class DefaultPipeline implements Pipeline {
 		CompoundTree nodes = new CompoundTree("nodes");
 		for (Node node : this.nodes.values())
 			nodes.append(node.toRecord());
-		CompoundTree resourceTypes = new CompoundTree("resourceTypes");
-		for (String suffix : this.resourceTypes.keySet())
-			resourceTypes.append(suffix);
+		CompoundTree resourceTypes = new CompoundTree("resourceTypes",
+				'[' + String.join(", ", this.resourceTypes.keySet()) + ']');
 		return new CompoundTree("Pipeline").append(nodes)
 				.append(resourceTypes);
 	}

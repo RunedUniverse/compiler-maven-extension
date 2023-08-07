@@ -7,7 +7,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
-import net.runeduniverse.tools.maven.compiler.mojos.api.CurrentContextUtils;
+import net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils;
 
 @Component(role = IReferenceScanner.class, hint = ReferenceScanner.HINT)
 public class ReferenceScanner implements IReferenceScanner {
@@ -25,8 +25,8 @@ public class ReferenceScanner implements IReferenceScanner {
 
 	@Override
 	public boolean scan() {
-		this.log = CurrentContextUtils.lookupComponent(this.mvnSession, Log.class);
-		this.runtime = CurrentContextUtils.lookupComponent(this.mvnSession, ICompilerRuntime.class);
+		this.log = SessionContextUtils.lookupSessionComponent(this.mvnSession, Log.class);
+		this.runtime = SessionContextUtils.lookupSessionComponent(this.mvnSession, ICompilerRuntime.class);
 
 		log.info("SourceDirectory: " + this.runtime.getSourceDirectory());
 		log.info("TargetDirectory: " + this.runtime.getTargetDirectory());
