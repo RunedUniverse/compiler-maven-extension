@@ -7,15 +7,17 @@ import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public interface Resource extends Recordable {
 
+	public ResourceType getType();
+
 	public File getFile();
 
 	public Collection<String> getTags();
 
-	public ResourceType getType();
-
 	public Collection<Resource> getSources();
 
 	public Collection<Resource> getImportedSources();
+
+	public Resource setFile(File file);
 
 	public Resource addTags(String... tags);
 
@@ -25,7 +27,7 @@ public interface Resource extends Recordable {
 
 	public Resource addSources(Collection<Resource> sources);
 
-	public Resource addImportedSource(Resource source);
+	public Resource addImportedSources(Resource... sources);
 
 	public Resource addImportedSources(Collection<Resource> sources);
 

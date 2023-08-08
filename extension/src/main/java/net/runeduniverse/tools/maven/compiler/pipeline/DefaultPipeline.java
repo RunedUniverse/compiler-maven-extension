@@ -1,39 +1,60 @@
 package net.runeduniverse.tools.maven.compiler.pipeline;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Node;
+import net.runeduniverse.tools.maven.compiler.pipeline.api.NodeContext;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Phase;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Pipeline;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.PipelineFactory;
+import net.runeduniverse.tools.maven.compiler.pipeline.api.Resource;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceType;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.*;
 
 @Component(role = Pipeline.class)
 public class DefaultPipeline implements Pipeline {
 
 	private final Map<String, Node> nodes = new LinkedHashMap<>();
+	private final Map<String, Set<Node>> nodesPerPhase = new LinkedHashMap<>();
 	private final Map<String, ResourceType> resourceTypes = new LinkedHashMap<>();
+	private final Set<String> phaseOrder = new LinkedHashSet<>();
 
 	@Requirement
 	private PipelineFactory factory;
+
+	public DefaultPipeline() {
+		for (Phase phase : Phase.values()) {
+			this.phaseOrder.add(phase.getId());
+		}
+	}
 
 	@Override
 	public Node acquireNode(String key) {
 		Node node = this.nodes.get(key);
 		if (node == null) {
 			node = this.factory.createNode(key);
-			if (node != null)
+			if (node != null) {
 				this.nodes.put(node.getKey(), node);
+				final String phase = toPhase(key);
+				Set<Node> phases = this.nodesPerPhase.get(phase);
+				if (phases == null) {
+					phases = new LinkedHashSet<>();
+					this.nodesPerPhase.put(phase, phases);
+				}
+				phases.add(node);
+			}
 		}
 		return node;
 	}
@@ -80,6 +101,60 @@ public class DefaultPipeline implements Pipeline {
 	}
 
 	@Override
+	public NodeContext getNodeContext(final MavenSession mvnSession, String key) {
+		final Node node = this.nodes.get(key);
+		if (node == null)
+			return null;
+		NodeContext context = lookupSessionComponent(mvnSession, NodeContext.class, key);
+		if (context == null) {
+			context = this.factory.createNodeContext(this, mvnSession, node);
+			addSessionComponent(mvnSession, NodeContext.class, key, context);
+		}
+		return context;
+	}
+
+	@Override
+	public NodeContext getNodeContext(final MavenSession mvnSession, Phase phase, String id) {
+		return getNodeContext(mvnSession, toKey(phase, id));
+	}
+
+	@Override
+	public Collection<Node> getNodesForType(final ResourceType type) {
+		final Set<Node> nodes = new LinkedHashSet<>();
+		for (Node node : this.nodes.values()) {
+			if (node.getResourceTypes()
+					.contains(type))
+				nodes.add(node);
+		}
+		return nodes;
+	}
+
+	@Override
+	public Node getNextNodeForType(final String phase, final ResourceType type) {
+		boolean found = false;
+		if (isBlank(phase))
+			found = true;
+		for (Iterator<String> i = this.phaseOrder.iterator(); i.hasNext();) {
+			if (found) {
+				final Collection<Node> nodes = this.nodesPerPhase.get(i.next());
+				if (nodes == null)
+					continue;
+				for (Node node : nodes)
+					if (node.getResourceTypes()
+							.contains(type))
+						return node;
+			} else if (phase.equals(i.next()))
+				found = true;
+		}
+		return null;
+	}
+
+	@Override
+	public Resource createResource(ResourceType type) {
+		return this.factory.createResource(type);
+	}
+
+	@Override
 	public CompoundTree toRecord() {
 		CompoundTree nodes = new CompoundTree("nodes");
 		for (Node node : this.nodes.values())
@@ -90,13 +165,22 @@ public class DefaultPipeline implements Pipeline {
 				.append(resourceTypes);
 	}
 
-	protected static String toKey(Phase phase, String id) {
+	protected static String toKey(final Phase phase, String id) {
 		String phaseId = "";
 		if (phase != null && !isBlank(phase.getId()))
 			phaseId = phase.getId();
 		if (isBlank(id))
 			id = "null";
 		return phaseId + ':' + id;
+	}
+
+	protected static String toPhase(final String key) {
+		if (key == null)
+			return null;
+		final String phase = key.substring(0, key.indexOf(':'));
+		if (isBlank(phase))
+			return null;
+		return phase;
 	}
 
 }
