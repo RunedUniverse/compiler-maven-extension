@@ -5,12 +5,12 @@ import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
-import net.runeduniverse.tools.maven.compiler.api.IReferenceScanner;
+import net.runeduniverse.tools.maven.compiler.api.CompilerRuntime;
+import net.runeduniverse.tools.maven.compiler.api.ResourceScanner;
 import net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils;
 
-@Component(role = IReferenceScanner.class, hint = ReferenceScanner.HINT)
-public class ReferenceScanner implements IReferenceScanner {
+@Component(role = ResourceScanner.class, hint = DefaultResourceScanner.HINT)
+public class DefaultResourceScanner implements ResourceScanner {
 
 	public static final String HINT = "default";
 
@@ -18,15 +18,15 @@ public class ReferenceScanner implements IReferenceScanner {
 	private MavenSession mvnSession;
 
 	protected Log log;
-	protected ICompilerRuntime runtime;
+	protected CompilerRuntime runtime;
 
-	public ReferenceScanner() {
+	public DefaultResourceScanner() {
 	}
 
 	@Override
 	public boolean scan() {
 		this.log = SessionContextUtils.lookupSessionComponent(this.mvnSession, Log.class);
-		this.runtime = SessionContextUtils.lookupSessionComponent(this.mvnSession, ICompilerRuntime.class);
+		this.runtime = SessionContextUtils.lookupSessionComponent(this.mvnSession, CompilerRuntime.class);
 
 		log.info("SourceDirectory: " + this.runtime.getSourceDirectory());
 		log.info("TargetDirectory: " + this.runtime.getTargetDirectory());

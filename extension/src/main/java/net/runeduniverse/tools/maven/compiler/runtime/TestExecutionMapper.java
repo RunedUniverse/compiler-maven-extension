@@ -2,16 +2,16 @@ package net.runeduniverse.tools.maven.compiler.runtime;
 
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.tools.maven.compiler.api.ICompilerRuntime;
-import net.runeduniverse.tools.maven.compiler.api.IExecutionMapper;
+import net.runeduniverse.tools.maven.compiler.api.CompilerRuntime;
+import net.runeduniverse.tools.maven.compiler.api.ExecutionMapper;
 
-@Component(role = IExecutionMapper.class, hint = TestExecutionMapper.HINT)
+@Component(role = ExecutionMapper.class, hint = TestExecutionMapper.HINT)
 public class TestExecutionMapper extends AExecutionMapper {
 
 	public static final String HINT = "test";
 
 	@Override
-	protected IExecutionMapper getThis() {
+	protected ExecutionMapper getThis() {
 		return this;
 	}
 
@@ -21,8 +21,8 @@ public class TestExecutionMapper extends AExecutionMapper {
 	}
 
 	@Override
-	public ICompilerRuntime createRuntime() {
-		return new CompilerRuntime(this.testSourceDirectory, this.testTargetDirectory);
+	public CompilerRuntime createRuntime() {
+		return new DefaultCompilerRuntime(this.testSourceDirectory, this.testTargetDirectory);
 	}
 
 }

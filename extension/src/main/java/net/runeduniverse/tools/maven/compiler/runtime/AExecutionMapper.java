@@ -2,9 +2,9 @@ package net.runeduniverse.tools.maven.compiler.runtime;
 
 import java.io.File;
 
-import net.runeduniverse.tools.maven.compiler.api.IExecutionMapper;
+import net.runeduniverse.tools.maven.compiler.api.ExecutionMapper;
 
-public abstract class AExecutionMapper implements IExecutionMapper {
+public abstract class AExecutionMapper implements ExecutionMapper {
 
 	protected File sourceDirectory;
 
@@ -14,28 +14,28 @@ public abstract class AExecutionMapper implements IExecutionMapper {
 
 	protected File testTargetDirectory;
 
-	protected abstract IExecutionMapper getThis();
+	protected abstract ExecutionMapper getThis();
 
 	@Override
-	public IExecutionMapper setSourceDirectory(File src) {
+	public ExecutionMapper setSourceDirectory(File src) {
 		this.sourceDirectory = src;
 		return getThis();
 	}
 
 	@Override
-	public IExecutionMapper setTestSourceDirectory(File src) {
+	public ExecutionMapper setTestSourceDirectory(File src) {
 		this.testSourceDirectory = src;
 		return getThis();
 	}
 
 	@Override
-	public IExecutionMapper setTargetDirectory(File target) {
+	public ExecutionMapper setTargetDirectory(File target) {
 		this.targetDirectory = target;
 		return getThis();
 	}
 
 	@Override
-	public IExecutionMapper setTestTargetDirectory(File target) {
+	public ExecutionMapper setTestTargetDirectory(File target) {
 		this.testTargetDirectory = target;
 		return getThis();
 	}

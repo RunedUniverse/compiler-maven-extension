@@ -3,7 +3,9 @@ package net.runeduniverse.tools.maven.compiler.pipeline;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Node;
@@ -46,10 +48,10 @@ public class DefaultNode implements Node {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree resourceTypes = new CompoundTree("resourceTypes");
+		final Set<String> suffixes = new LinkedHashSet<>();
 		for (String suffix : this.resourceTypes.keySet())
-			resourceTypes.append(suffix);
-		return new CompoundTree("Node", this.key).append(resourceTypes);
+			suffixes.add(suffix);
+		return new CompoundTree("Node", this.key).append("suffixes", String.join(", ", suffixes));
 	}
 
 }

@@ -24,7 +24,7 @@ public interface Pipeline extends Recordable {
 
 	public Collection<Node> getNodesForType(ResourceType type);
 
-	public Node getNextNodeForType(final String phase, final ResourceType type);
+	public Node getNextNodeForType(final String currentPhaseId, final ResourceType type);
 
 	public NodeContext getNodeContext(final MavenSession mvnSession, String key);
 
