@@ -1,6 +1,8 @@
 package net.runeduniverse.tools.maven.compiler.pipeline;
 
+import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -18,6 +20,7 @@ import net.runeduniverse.tools.maven.compiler.pipeline.api.Phase;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Pipeline;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.PipelineFactory;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Resource;
+import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceIndex;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceType;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
@@ -150,8 +153,40 @@ public class DefaultPipeline implements Pipeline {
 	}
 
 	@Override
-	public Resource createResource(ResourceType type) {
-		return this.factory.createResource(type);
+	public Resource createResource(final MavenSession mvnSession, final File file) {
+		ResourceIndex index = lookupSessionComponent(mvnSession, ResourceIndex.class, "default");
+		if (index == null) {
+			index = this.factory.createResourceIndex(this);
+			addSessionComponent(mvnSession, ResourceIndex.class, "default", index);
+		}
+		return index.createResource(file);
+	}
+
+	@Override
+	public void addResourceToNextNodeContext(final MavenSession mvnSession, final String curPhaseId,
+			final Resource resource) {
+		if (resource == null)
+			return;
+		final Node node = getNextNodeForType(curPhaseId, resource.getType());
+		if (node == null)
+			return;
+		final NodeContext context = getNodeContext(mvnSession, node.getKey());
+		context.addResource(resource);
+	}
+
+	@Override
+	public ResourceType getType(final String suffix) {
+		return this.resourceTypes.get(suffix);
+	}
+
+	@Override
+	public Collection<String> getResourceSuffixes() {
+		return Collections.unmodifiableSet(this.resourceTypes.keySet());
+	}
+
+	@Override
+	public Collection<ResourceType> getResourceTypes() {
+		return Collections.unmodifiableCollection(this.resourceTypes.values());
 	}
 
 	@Override

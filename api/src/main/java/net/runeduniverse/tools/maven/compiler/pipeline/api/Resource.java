@@ -17,8 +17,6 @@ public interface Resource extends Recordable {
 
 	public Collection<Resource> getImportedSources();
 
-	public Resource setFile(File file);
-
 	public Resource addTags(String... tags);
 
 	public Resource addTags(Collection<String> tags);

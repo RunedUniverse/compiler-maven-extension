@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.maven.compiler.pipeline.api;
 
+import java.io.File;
 import java.util.Collection;
 
 public interface NodeContext {
@@ -12,6 +13,6 @@ public interface NodeContext {
 
 	public NodeContext addResult(final Resource result);
 
-	public Resource addResult(final ResourceType type);
+	public Resource addResult(final File file);
 
 }

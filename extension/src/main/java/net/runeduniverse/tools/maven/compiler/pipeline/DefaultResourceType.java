@@ -15,4 +15,16 @@ public class DefaultResourceType implements ResourceType {
 		return this.suffix;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof ResourceType))
+			return false;
+		final String suffix = ((ResourceType) obj).getSuffix();
+		if (this.suffix == null && suffix == null)
+			return true;
+		return this.suffix.equals(suffix);
+	}
+
 }

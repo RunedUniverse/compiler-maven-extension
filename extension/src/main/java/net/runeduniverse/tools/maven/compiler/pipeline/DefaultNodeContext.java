@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.maven.compiler.pipeline;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -47,15 +48,15 @@ public class DefaultNodeContext implements NodeContext {
 		final Node node = this.pipeline.getNextNodeForType(DefaultPipeline.toPhase(this.node.getKey()),
 				result.getType());
 		if (node == null)
-			return null;
+			return this;
 		NodeContext context = this.pipeline.getNodeContext(this.mvnSession, node.getKey());
 		context.addResource(result);
 		return this;
 	}
 
 	@Override
-	public Resource addResult(ResourceType type) {
-		Resource result = this.pipeline.createResource(type);
+	public Resource addResult(final File file) {
+		Resource result = this.pipeline.createResource(this.mvnSession, file);
 		addResult(result);
 		return result;
 	}

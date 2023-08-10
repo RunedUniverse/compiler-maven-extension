@@ -12,15 +12,16 @@ import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceType;
 
 public class DefaultResource implements Resource {
 
-	protected final ResourceType type;
 	protected final Set<String> tags = new LinkedHashSet<>();
 	protected final Set<Resource> sources = new LinkedHashSet<>();
 	protected final Set<Resource> importedSources = new LinkedHashSet<>();
 
-	protected File file = null;
+	protected final ResourceType type;
+	protected final File file;
 
-	public DefaultResource(final ResourceType type) {
+	public DefaultResource(final ResourceType type, final File file) {
 		this.type = type;
+		this.file = file;
 	}
 
 	@Override
@@ -46,12 +47,6 @@ public class DefaultResource implements Resource {
 	@Override
 	public Collection<Resource> getImportedSources() {
 		return this.importedSources;
-	}
-
-	@Override
-	public Resource setFile(File file) {
-		this.file = file;
-		return this;
 	}
 
 	@Override

@@ -7,7 +7,7 @@ import net.runeduniverse.tools.maven.compiler.pipeline.api.Node;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.NodeContext;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Pipeline;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.PipelineFactory;
-import net.runeduniverse.tools.maven.compiler.pipeline.api.Resource;
+import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceIndex;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceType;
 
 @Component(role = PipelineFactory.class)
@@ -29,8 +29,8 @@ public class DefaultPipelineFactory implements PipelineFactory {
 	}
 
 	@Override
-	public Resource createResource(final ResourceType type) {
-		return new DefaultResource(type);
+	public ResourceIndex createResourceIndex(final Pipeline pipeline) {
+		return new DefaultResourceIndex(pipeline);
 	}
 
 }

@@ -10,6 +10,6 @@ public interface PipelineFactory {
 
 	public ResourceType createResourceType(final String suffix);
 
-	public Resource createResource(final ResourceType type);
+	public ResourceIndex createResourceIndex(final Pipeline pipeline);
 
 }
