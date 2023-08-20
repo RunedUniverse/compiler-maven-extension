@@ -1,6 +1,5 @@
 package net.runeduniverse.tools.maven.compiler.pipeline.api;
 
-import java.io.File;
 import java.util.Collection;
 
 import org.apache.maven.execution.MavenSession;
@@ -31,12 +30,12 @@ public interface Pipeline extends Recordable {
 
 	public NodeContext getNodeContext(final MavenSession mvnSession, final Phase phase, final String id);
 
-	public Resource createResource(final MavenSession mvnSession, final File file);
-
 	public void addResourceToNextNodeContext(final MavenSession mvnSession, final String curPhaseId,
 			final Resource resource);
 
 	public ResourceType getType(String suffix);
+
+	public ResourceIndex getResourceIndex(final MavenSession mvnSession);
 
 	public Collection<String> getResourceSuffixes();
 

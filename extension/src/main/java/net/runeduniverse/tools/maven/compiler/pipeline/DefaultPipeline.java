@@ -1,6 +1,5 @@
 package net.runeduniverse.tools.maven.compiler.pipeline;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -153,16 +152,6 @@ public class DefaultPipeline implements Pipeline {
 	}
 
 	@Override
-	public Resource createResource(final MavenSession mvnSession, final File file) {
-		ResourceIndex index = lookupSessionComponent(mvnSession, ResourceIndex.class, "default");
-		if (index == null) {
-			index = this.factory.createResourceIndex(this);
-			addSessionComponent(mvnSession, ResourceIndex.class, "default", index);
-		}
-		return index.createResource(file);
-	}
-
-	@Override
 	public void addResourceToNextNodeContext(final MavenSession mvnSession, final String curPhaseId,
 			final Resource resource) {
 		if (resource == null)
@@ -177,6 +166,16 @@ public class DefaultPipeline implements Pipeline {
 	@Override
 	public ResourceType getType(final String suffix) {
 		return this.resourceTypes.get(suffix);
+	}
+
+	@Override
+	public ResourceIndex getResourceIndex(final MavenSession mvnSession) {
+		ResourceIndex index = lookupSessionComponent(mvnSession, ResourceIndex.class, "default");
+		if (index == null) {
+			index = this.factory.createResourceIndex(this);
+			addSessionComponent(mvnSession, ResourceIndex.class, "default", index);
+		}
+		return index;
 	}
 
 	@Override
@@ -217,5 +216,4 @@ public class DefaultPipeline implements Pipeline {
 			return null;
 		return phase;
 	}
-
 }

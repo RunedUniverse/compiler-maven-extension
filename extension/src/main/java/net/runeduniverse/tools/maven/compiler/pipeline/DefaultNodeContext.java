@@ -12,7 +12,6 @@ import net.runeduniverse.tools.maven.compiler.pipeline.api.Node;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.NodeContext;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Pipeline;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Resource;
-import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceType;
 
 public class DefaultNodeContext implements NodeContext {
 
@@ -56,7 +55,8 @@ public class DefaultNodeContext implements NodeContext {
 
 	@Override
 	public Resource addResult(final File file) {
-		Resource result = this.pipeline.createResource(this.mvnSession, file);
+		Resource result = this.pipeline.getResourceIndex(this.mvnSession)
+				.createResource(file);
 		addResult(result);
 		return result;
 	}
