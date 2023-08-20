@@ -46,9 +46,12 @@ public interface SessionContextUtils {
 		Map<String, R> map = getSessionContext(mvnSession, role);
 		if (map == null)
 			return null;
+		R val = map.get("default");
+		if (val != null)
+			return val;
 		for (Iterator<R> i = map.values()
 				.iterator(); i.hasNext();) {
-			R val = i.next();
+			val = i.next();
 			if (val != null)
 				return val;
 		}
@@ -62,7 +65,12 @@ public interface SessionContextUtils {
 		return map.get(hint);
 	}
 
-	public static <R, T extends R> void addSessionComponent(final MavenSession mvnSession, final Class<R> role,
+	public static <R, T extends R> void putSessionComponent(final MavenSession mvnSession, final Class<R> role,
+			T component) {
+		putSessionComponent(mvnSession, role, "default", component);
+	}
+
+	public static <R, T extends R> void putSessionComponent(final MavenSession mvnSession, final Class<R> role,
 			final String hint, T component) {
 		Map<String, R> map = getSessionContext(mvnSession, role);
 		if (map == null) {

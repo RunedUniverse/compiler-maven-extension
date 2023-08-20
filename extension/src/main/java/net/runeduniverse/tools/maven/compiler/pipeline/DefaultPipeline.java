@@ -110,7 +110,7 @@ public class DefaultPipeline implements Pipeline {
 		NodeContext context = lookupSessionComponent(mvnSession, NodeContext.class, key);
 		if (context == null) {
 			context = this.factory.createNodeContext(this, mvnSession, node);
-			addSessionComponent(mvnSession, NodeContext.class, key, context);
+			putSessionComponent(mvnSession, NodeContext.class, key, context);
 		}
 		return context;
 	}
@@ -173,7 +173,7 @@ public class DefaultPipeline implements Pipeline {
 		ResourceIndex index = lookupSessionComponent(mvnSession, ResourceIndex.class, "default");
 		if (index == null) {
 			index = this.factory.createResourceIndex(this);
-			addSessionComponent(mvnSession, ResourceIndex.class, "default", index);
+			putSessionComponent(mvnSession, ResourceIndex.class, "default", index);
 		}
 		return index;
 	}

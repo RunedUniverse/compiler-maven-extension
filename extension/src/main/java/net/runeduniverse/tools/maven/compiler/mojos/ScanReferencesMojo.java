@@ -2,7 +2,7 @@ package net.runeduniverse.tools.maven.compiler.mojos;
 
 import static net.runeduniverse.tools.maven.compiler.mojos.api.PlexusContextUtils.getPlexusComponentDescriptorMap;
 import static net.runeduniverse.tools.maven.compiler.mojos.api.PlexusContextUtils.loadPlexusComponent;
-import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.addSessionComponent;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.putSessionComponent;
 import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.getSessionContext;
 import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.putSessionContext;
 import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.releaseSessionComponent;
@@ -39,7 +39,7 @@ import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.api.CompilerRuntime;
-import net.runeduniverse.tools.maven.compiler.api.ResourceScanner;
+import net.runeduniverse.tools.maven.compiler.api.PipelineInitializer;
 import net.runeduniverse.tools.maven.compiler.api.ExecutionMapper;
 
 /**
@@ -120,7 +120,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 
 	private Map<String, ComponentDescriptor<ExecutionMapper>> executionMapperDescriptors = new LinkedHashMap<>(2);
 
-	private Map<String, ComponentDescriptor<ResourceScanner>> referenceScannerDescriptors = new LinkedHashMap<>();
+	private Map<String, ComponentDescriptor<PipelineInitializer>> referenceScannerDescriptors = new LinkedHashMap<>();
 
 	// RUNTIME VALUES
 
@@ -131,7 +131,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 
-		addSessionComponent(mvnSession, Log.class, "default", getLog());
+		putSessionComponent(mvnSession, Log.class, getLog());
 
 		// load context
 		compilerRuntimeContext = getSessionContext(this.mvnSession, CompilerRuntime.class);
@@ -173,10 +173,10 @@ public class ScanReferencesMojo extends AbstractMojo {
 
 		// identifyNodes
 		getLog().info("identifying lifecycle process nodes");
-		for (ComponentDescriptor<ResourceScanner> descriptor : this.referenceScannerDescriptors.values()) {
+		for (ComponentDescriptor<PipelineInitializer> descriptor : this.referenceScannerDescriptors.values()) {
 			try {
 				loadPlexusComponent(this.container, descriptor, (c, scanner) -> {
-					scanner.identifyNodes();
+					scanner.initialize();
 				});
 			} catch (ComponentLookupException e) {
 				getLog().error(e);
@@ -185,21 +185,10 @@ public class ScanReferencesMojo extends AbstractMojo {
 		getLog().info("");
 		// scan
 		getLog().info("mapping references of source-files");
-		for (ComponentDescriptor<ResourceScanner> descriptor : this.referenceScannerDescriptors.values()) {
+		for (ComponentDescriptor<PipelineInitializer> descriptor : this.referenceScannerDescriptors.values()) {
 			try {
 				loadPlexusComponent(this.container, descriptor, (c, scanner) -> {
 					scanner.scan();
-				});
-			} catch (ComponentLookupException e) {
-				getLog().error(e);
-			}
-		}
-		getLog().info("");
-		// TODO collect collectors from compiler plugins and run those
-		for (ComponentDescriptor<ResourceScanner> descriptor : this.referenceScannerDescriptors.values()) {
-			try {
-				loadPlexusComponent(this.container, descriptor, (c, scanner) -> {
-					scanner.logAnalisis(getLog());
 				});
 			} catch (ComponentLookupException e) {
 				getLog().error(e);
@@ -223,7 +212,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 				ClassRealm pluginRealm = descriptor.getClassRealm();
 
 				this.referenceScannerDescriptors.putAll(getPlexusComponentDescriptorMap(this.container, pluginRealm,
-						null, ResourceScanner.class.getCanonicalName()));
+						null, PipelineInitializer.class.getCanonicalName()));
 
 				this.executionMapperDescriptors.putAll(getPlexusComponentDescriptorMap(this.container, pluginRealm,
 						null, ExecutionMapper.class.getCanonicalName()));
