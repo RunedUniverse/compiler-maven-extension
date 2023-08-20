@@ -18,9 +18,9 @@
 			<lifecycles>
 				<lifecycle id="compiler">
 					<phases>
-						<phase id="scan-references">
+						<phase id="initialize-pipe">
 							<goals>
-								<goal id="scan-references">
+								<goal id="initialize">
 									<modes>
 										<default />
 										<dev />
@@ -45,9 +45,9 @@
 			<lifecycles>
 				<lifecycle id="compiler">
 					<phases>
-						<phase id="scan-references">
+						<phase id="initialize-pipe">
 							<goals>
-								<goal id="scan-references">
+								<goal id="initialize">
 									<modes>
 										<default />
 										<dev />

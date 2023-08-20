@@ -2,8 +2,8 @@ package net.runeduniverse.tools.maven.compiler.mojos;
 
 import static net.runeduniverse.tools.maven.compiler.mojos.api.PlexusContextUtils.getPlexusComponentDescriptorMap;
 import static net.runeduniverse.tools.maven.compiler.mojos.api.PlexusContextUtils.loadPlexusComponent;
-import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.putSessionComponent;
 import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.getSessionContext;
+import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.putSessionComponent;
 import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.putSessionContext;
 import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.releaseSessionComponent;
 
@@ -37,20 +37,21 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.api.CompilerRuntime;
-import net.runeduniverse.tools.maven.compiler.api.PipelineInitializer;
 import net.runeduniverse.tools.maven.compiler.api.ExecutionMapper;
+import net.runeduniverse.tools.maven.compiler.api.PipelineInitializer;
 
 /**
  * Maps out all references of the source files to later be able to compile
  * source files in order
- * 
+ *
  * @author VenaNocta
- * @phase scan-references
- * @goal scan-references
+ * @phase initialize-pipe
+ * @goal initialize
  */
-public class ScanReferencesMojo extends AbstractMojo {
+public class InitializeMojo extends AbstractMojo {
 	// https://maven.apache.org/developers/mojo-api-specification.html
 	// https://maven.apache.org/plugin-tools/maven-plugin-tools-java/index.html
 
@@ -136,7 +137,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 		// load context
 		compilerRuntimeContext = getSessionContext(this.mvnSession, CompilerRuntime.class);
 		if (compilerRuntimeContext == null)
-			compilerRuntimeContext = new LinkedHashMap<String, CompilerRuntime>();
+			compilerRuntimeContext = new LinkedHashMap<>();
 		putSessionContext(this.mvnSession, CompilerRuntime.class, compilerRuntimeContext);
 
 		// seed with defaults
@@ -153,7 +154,7 @@ public class ScanReferencesMojo extends AbstractMojo {
 
 		try {
 			loadPlexusComponent(this.container, executionMapperDescriptor, (context, executionMapper) -> {
-				ScanReferencesMojo.this.executionMapper = executionMapper;
+				InitializeMojo.this.executionMapper = executionMapper;
 			});
 		} catch (ComponentLookupException e) {
 			throw new MojoExecutionException(
@@ -182,9 +183,8 @@ public class ScanReferencesMojo extends AbstractMojo {
 				getLog().error(e);
 			}
 		}
-		getLog().info("");
 		// scan
-		getLog().info("mapping references of source-files");
+		getLog().info("scanning source-files");
 		for (ComponentDescriptor<PipelineInitializer> descriptor : this.referenceScannerDescriptors.values()) {
 			try {
 				loadPlexusComponent(this.container, descriptor, (c, scanner) -> {
@@ -194,7 +194,6 @@ public class ScanReferencesMojo extends AbstractMojo {
 				getLog().error(e);
 			}
 		}
-		getLog().info("finished mapping references of source-files");
 
 		// debug:
 		// this.buildRealm();

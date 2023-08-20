@@ -5,11 +5,11 @@
 		<id>compiler</id>
 		<phases>
 			<phase>
-				<id>scan-references</id>
+				<id>initialize-pipe</id>
 				<executions>
 					<execution>
 						<goals>
-							<goal>net.runeduniverse.tools.maven.compiler:compiler-maven-extension:scan-references
+							<goal>net.runeduniverse.tools.maven.compiler:compiler-maven-extension:initialize
 							</goal>
 						</goals>
 					</execution>

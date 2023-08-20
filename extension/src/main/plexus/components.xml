@@ -8,7 +8,7 @@
 			<configuration>
 				<id>compiler</id>
 				<phases>
-					<phase>scan-references</phase>
+					<phase>initialize-pipe</phase>
 					<phase>pre-preprocessor</phase>
 					<phase>preprocessor</phase>
 					<phase>post-preprocessor</phase>
