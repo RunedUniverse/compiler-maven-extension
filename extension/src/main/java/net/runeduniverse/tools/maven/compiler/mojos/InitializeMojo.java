@@ -48,7 +48,7 @@ import net.runeduniverse.tools.maven.compiler.api.PipelineInitializer;
  * source files in order
  *
  * @author VenaNocta
- * @phase initialize-pipe
+ * @phase initialize-compiler
  * @goal initialize
  */
 public class InitializeMojo extends AbstractMojo {

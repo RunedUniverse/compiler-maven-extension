@@ -1,11 +1,13 @@
 <lifecycles xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/xsd/lifecycle-1.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/LIFECYCLE/1.0.0 
+	http://maven.apache.org/xsd/lifecycle-1.0.0.xsd">
+
 	<lifecycle>
 		<id>compiler</id>
 		<phases>
 			<phase>
-				<id>initialize-pipe</id>
+				<id>initialize-compiler</id>
 				<executions>
 					<execution>
 						<goals>
@@ -62,4 +64,5 @@
 			</phase>
 		</phases>
 	</lifecycle>
+
 </lifecycles>

@@ -18,8 +18,16 @@
 			<lifecycles>
 				<lifecycle id="compiler">
 					<phases>
-						<phase id="initialize-pipe">
+						<phase id="initialize-compiler">
 							<goals>
+								<goal id="toolchain" optional="true">
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-toolchains-plugin</artifactId>
+								</goal>
 								<goal id="initialize">
 									<modes>
 										<default />
@@ -45,8 +53,16 @@
 			<lifecycles>
 				<lifecycle id="compiler">
 					<phases>
-						<phase id="initialize-pipe">
+						<phase id="initialize-compiler">
 							<goals>
+								<goal id="toolchain" optional="true">
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<groupId>org.apache.maven.plugins</groupId>
+									<artifactId>maven-toolchains-plugin</artifactId>
+								</goal>
 								<goal id="initialize">
 									<modes>
 										<default />
