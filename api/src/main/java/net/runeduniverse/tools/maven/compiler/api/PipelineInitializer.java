@@ -4,6 +4,4 @@ public interface PipelineInitializer {
 
 	public void initialize();
 
-	public boolean scan();
-
 }

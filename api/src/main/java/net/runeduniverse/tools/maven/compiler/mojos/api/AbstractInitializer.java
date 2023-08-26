@@ -47,15 +47,10 @@ public abstract class AbstractInitializer implements PipelineInitializer {
 
 	@Override
 	public void initialize() {
-		this.log = SessionContextUtils.lookupSessionComponent(this.mvnSession, Log.class);
-		this.runtime = SessionContextUtils.lookupSessionComponent(this.mvnSession, CompilerRuntime.class);
+		this.log = SessionContextUtils.loadSessionComponent(this.mvnSession, Log.class);
+		this.runtime = SessionContextUtils.loadSessionComponent(this.mvnSession, CompilerRuntime.class);
 
 		_initialize();
-	}
-
-	@Override
-	public boolean scan() {
-		return true;
 	}
 
 }

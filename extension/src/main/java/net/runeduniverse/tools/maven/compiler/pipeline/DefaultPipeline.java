@@ -107,7 +107,7 @@ public class DefaultPipeline implements Pipeline {
 		final Node node = this.nodes.get(key);
 		if (node == null)
 			return null;
-		NodeContext context = lookupSessionComponent(mvnSession, NodeContext.class, key);
+		NodeContext context = loadSessionComponent(mvnSession, NodeContext.class, key);
 		if (context == null) {
 			context = this.factory.createNodeContext(this, mvnSession, node);
 			putSessionComponent(mvnSession, NodeContext.class, key, context);
@@ -170,7 +170,7 @@ public class DefaultPipeline implements Pipeline {
 
 	@Override
 	public ResourceIndex getResourceIndex(final MavenSession mvnSession) {
-		ResourceIndex index = lookupSessionComponent(mvnSession, ResourceIndex.class, "default");
+		ResourceIndex index = loadSessionComponent(mvnSession, ResourceIndex.class, "default");
 		if (index == null) {
 			index = this.factory.createResourceIndex(this);
 			putSessionComponent(mvnSession, ResourceIndex.class, "default", index);

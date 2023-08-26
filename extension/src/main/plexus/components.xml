@@ -9,6 +9,7 @@
 				<id>compiler</id>
 				<phases>
 					<phase>initialize-compiler</phase>
+					<phase>index-sources</phase>
 					<phase>pre-preprocessor</phase>
 					<phase>preprocessor</phase>
 					<phase>post-preprocessor</phase>

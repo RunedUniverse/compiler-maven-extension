@@ -18,6 +18,17 @@
 				</executions>
 			</phase>
 			<phase>
+				<id>index-sources</id>
+				<executions>
+					<execution>
+						<goals>
+							<goal>net.runeduniverse.tools.maven.compiler:compiler-maven-extension:scan-sources
+							</goal>
+						</goals>
+					</execution>
+				</executions>
+			</phase>
+			<phase>
 				<id>pre-preprocessor</id>
 			</phase>
 			<phase>

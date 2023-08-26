@@ -42,7 +42,7 @@ public interface SessionContextUtils {
 				.setContextValue(role.getCanonicalName(), null);
 	}
 
-	public static <R> R lookupSessionComponent(final MavenSession mvnSession, final Class<R> role) {
+	public static <R> R loadSessionComponent(final MavenSession mvnSession, final Class<R> role) {
 		Map<String, R> map = getSessionContext(mvnSession, role);
 		if (map == null)
 			return null;
@@ -58,7 +58,7 @@ public interface SessionContextUtils {
 		return null;
 	}
 
-	public static <R> R lookupSessionComponent(final MavenSession mvnSession, final Class<R> role, final String hint) {
+	public static <R> R loadSessionComponent(final MavenSession mvnSession, final Class<R> role, final String hint) {
 		Map<String, R> map = getSessionContext(mvnSession, role);
 		if (map == null)
 			return null;

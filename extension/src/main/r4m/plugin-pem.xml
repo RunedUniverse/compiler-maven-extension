@@ -38,6 +38,18 @@
 								</goal>
 							</goals>
 						</phase>
+						<phase id="index-sources">
+							<goals>
+								<goal id="scan-sources">
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<groupId>net.runeduniverse.tools.maven.compiler</groupId>
+									<artifactId>compiler-maven-extension</artifactId>
+								</goal>
+							</goals>
+						</phase>
 					</phases>
 				</lifecycle>
 			</lifecycles>
@@ -64,6 +76,18 @@
 									<artifactId>maven-toolchains-plugin</artifactId>
 								</goal>
 								<goal id="initialize">
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<groupId>net.runeduniverse.tools.maven.compiler</groupId>
+									<artifactId>compiler-maven-extension</artifactId>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="index-sources">
+							<goals>
+								<goal id="scan-sources">
 									<modes>
 										<default />
 										<dev />

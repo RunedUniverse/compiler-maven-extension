@@ -13,14 +13,14 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 import net.runeduniverse.tools.maven.compiler.api.CompilerRuntime;
-import net.runeduniverse.tools.maven.compiler.api.PipelineInitializer;
+import net.runeduniverse.tools.maven.compiler.api.ResourceScanner;
 import net.runeduniverse.tools.maven.compiler.mojos.api.ResourceCollector;
 import net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Pipeline;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Resource;
 
-@Component(role = PipelineInitializer.class, hint = DefaultResourceScanner.HINT)
-public class DefaultResourceScanner implements PipelineInitializer {
+@Component(role = ResourceScanner.class, hint = DefaultResourceScanner.HINT)
+public class DefaultResourceScanner implements ResourceScanner {
 
 	public static final String HINT = "default";
 
@@ -31,22 +31,13 @@ public class DefaultResourceScanner implements PipelineInitializer {
 	private Pipeline pipeline;
 
 	protected Log log;
-	protected CompilerRuntime runtime;
-
-	public DefaultResourceScanner() {
-	}
 
 	@Override
-	public void initialize() {
-		this.log = SessionContextUtils.lookupSessionComponent(this.mvnSession, Log.class);
-		this.runtime = SessionContextUtils.lookupSessionComponent(this.mvnSession, CompilerRuntime.class);
-	}
+	public boolean scan(CompilerRuntime runtime) {
+		this.log = SessionContextUtils.loadSessionComponent(this.mvnSession, Log.class);
+		this.log.info("Scanning SourceDirectory: " + runtime.getSourceDirectory());
 
-	@Override
-	public boolean scan() {
-		this.log.info("Scanning SourceDirectory: " + this.runtime.getSourceDirectory());
-
-		Path sources = this.runtime.getSourceDirectory()
+		Path sources = runtime.getSourceDirectory()
 				.toPath();
 		ResourceCollector collector = new ResourceCollector(this.pipeline.getResourceIndex(this.mvnSession));
 

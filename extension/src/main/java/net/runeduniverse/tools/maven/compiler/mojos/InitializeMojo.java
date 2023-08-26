@@ -183,17 +183,6 @@ public class InitializeMojo extends AbstractMojo {
 				getLog().error(e);
 			}
 		}
-		// scan
-		getLog().info("scanning source-files");
-		for (ComponentDescriptor<PipelineInitializer> descriptor : this.referenceScannerDescriptors.values()) {
-			try {
-				loadPlexusComponent(this.container, descriptor, (c, scanner) -> {
-					scanner.scan();
-				});
-			} catch (ComponentLookupException e) {
-				getLog().error(e);
-			}
-		}
 
 		// debug:
 		// this.buildRealm();
