@@ -8,6 +8,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+import net.runeduniverse.lib.utils.maven.SessionContextUtils;
 import net.runeduniverse.tools.maven.compiler.api.CompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.PipelineInitializer;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Pipeline;

@@ -81,6 +81,10 @@
 			<groupId>net.runeduniverse.lib.utils</groupId>
 			<artifactId>utils-logging</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-maven</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

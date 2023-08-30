@@ -1,8 +1,8 @@
 package net.runeduniverse.tools.maven.compiler.mojos;
 
-import static net.runeduniverse.tools.maven.compiler.mojos.api.PlexusContextUtils.getPlexusComponentDescriptorMap;
-import static net.runeduniverse.tools.maven.compiler.mojos.api.PlexusContextUtils.loadPlexusComponent;
-import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.loadSessionComponent;
+import static net.runeduniverse.lib.utils.maven.PlexusContextUtils.getPlexusComponentDescriptorMap;
+import static net.runeduniverse.lib.utils.maven.PlexusContextUtils.loadPlexusComponent;
+import static net.runeduniverse.lib.utils.maven.SessionContextUtils.loadSessionComponent;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

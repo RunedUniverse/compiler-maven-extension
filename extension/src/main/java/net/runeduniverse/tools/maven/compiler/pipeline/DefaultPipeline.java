@@ -1,5 +1,9 @@
 package net.runeduniverse.tools.maven.compiler.pipeline;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import static net.runeduniverse.lib.utils.maven.SessionContextUtils.loadSessionComponent;
+import static net.runeduniverse.lib.utils.maven.SessionContextUtils.putSessionComponent;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -21,9 +25,6 @@ import net.runeduniverse.tools.maven.compiler.pipeline.api.PipelineFactory;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Resource;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceIndex;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceType;
-
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-import static net.runeduniverse.tools.maven.compiler.mojos.api.SessionContextUtils.*;
 
 @Component(role = Pipeline.class)
 public class DefaultPipeline implements Pipeline {
