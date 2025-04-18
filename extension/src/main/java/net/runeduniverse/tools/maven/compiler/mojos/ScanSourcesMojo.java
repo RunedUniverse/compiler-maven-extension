@@ -1,9 +1,5 @@
 package net.runeduniverse.tools.maven.compiler.mojos;
 
-import static net.runeduniverse.lib.utils.maven.PlexusContextUtils.getPlexusComponentDescriptorMap;
-import static net.runeduniverse.lib.utils.maven.PlexusContextUtils.loadPlexusComponent;
-import static net.runeduniverse.lib.utils.maven.SessionContextUtils.loadSessionComponent;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,6 +22,10 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 
 import net.runeduniverse.tools.maven.compiler.api.CompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.ResourceScanner;
+
+import static net.runeduniverse.lib.utils.plexus.PlexusContextUtils.getPlexusComponentDescriptorMap;
+import static net.runeduniverse.lib.utils.plexus.PlexusContextUtils.loadPlexusComponent;
+import static net.runeduniverse.lib.utils.maven.SessionContextUtils.loadSessionComponent;
 
 /**
  * Maps all source files to nodes to later be used in the compiler pipeline

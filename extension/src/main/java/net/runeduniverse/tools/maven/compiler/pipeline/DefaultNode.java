@@ -7,7 +7,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Node;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceType;
 
@@ -51,7 +52,7 @@ public class DefaultNode implements Node {
 		final Set<String> suffixes = new LinkedHashSet<>();
 		for (String suffix : this.resourceTypes.keySet())
 			suffixes.add(suffix);
-		return new CompoundTree("Node", this.key).append("suffixes", String.join(", ", suffixes));
+		return new DefaultCompoundTree("Node", this.key).append("suffixes", String.join(", ", suffixes));
 	}
 
 }

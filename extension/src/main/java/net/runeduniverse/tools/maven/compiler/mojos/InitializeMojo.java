@@ -1,12 +1,5 @@
 package net.runeduniverse.tools.maven.compiler.mojos;
 
-import static net.runeduniverse.lib.utils.maven.PlexusContextUtils.getPlexusComponentDescriptorMap;
-import static net.runeduniverse.lib.utils.maven.PlexusContextUtils.loadPlexusComponent;
-import static net.runeduniverse.lib.utils.maven.SessionContextUtils.getSessionContext;
-import static net.runeduniverse.lib.utils.maven.SessionContextUtils.putSessionComponent;
-import static net.runeduniverse.lib.utils.maven.SessionContextUtils.putSessionContext;
-import static net.runeduniverse.lib.utils.maven.SessionContextUtils.releaseSessionComponent;
-
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -38,10 +31,18 @@ import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.api.CompilerRuntime;
 import net.runeduniverse.tools.maven.compiler.api.ExecutionMapper;
 import net.runeduniverse.tools.maven.compiler.api.PipelineInitializer;
+
+import static net.runeduniverse.lib.utils.plexus.PlexusContextUtils.getPlexusComponentDescriptorMap;
+import static net.runeduniverse.lib.utils.plexus.PlexusContextUtils.loadPlexusComponent;
+import static net.runeduniverse.lib.utils.maven.SessionContextUtils.getSessionContext;
+import static net.runeduniverse.lib.utils.maven.SessionContextUtils.putSessionComponent;
+import static net.runeduniverse.lib.utils.maven.SessionContextUtils.putSessionContext;
+import static net.runeduniverse.lib.utils.maven.SessionContextUtils.releaseSessionComponent;
 
 /**
  * Maps out all references of the source files to later be able to compile
@@ -216,7 +217,7 @@ public class InitializeMojo extends AbstractMojo {
 		Set<ClassRealm> rootlessRealms = new LinkedHashSet<>();
 
 		for (ClassRealm realm : world.getRealms()) {
-			CompoundTree t = new CompoundTree(realm.getId());
+			CompoundTree t = new DefaultCompoundTree(realm.getId());
 			treeMap.put(realm, t);
 			rootlessRealms.add(realm);
 		}
@@ -227,7 +228,7 @@ public class InitializeMojo extends AbstractMojo {
 			t.append(treeMap.get(r));
 			rootlessRealms.remove(r);
 		}
-		CompoundTree loadedRealmsTree = new CompoundTree("ClassWorld");
+		CompoundTree loadedRealmsTree = new DefaultCompoundTree("ClassWorld");
 		for (ClassRealm r : rootlessRealms)
 			loadedRealmsTree.append(treeMap.get(r));
 		return loadedRealmsTree;

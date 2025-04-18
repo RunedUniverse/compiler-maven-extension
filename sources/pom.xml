@@ -26,11 +26,10 @@
 		<!-- VERSIONS -->
 		<maven-version>3.8.4</maven-version>
 		<!-- ARTIFACT VERSIONS -->
-		<runeduniverse-utils-common-version>[1.0.1,)</runeduniverse-utils-common-version>
-		<runeduniverse-utils-logging-version>[1.0.1,)</runeduniverse-utils-logging-version>
-		<runeduniverse-utils-maven-version>[1.0.0,)</runeduniverse-utils-maven-version>
 		<plexus-utils-version>3.3.0</plexus-utils-version>
 		<!-- ARTIFACT VERSIONS - TESTING -->
+		<!-- ARTIFACT VERSIONS - BOMs -->
+		<runeduniverse-utils-bom-version>2.0.0</runeduniverse-utils-bom-version>
 	</properties>
 
 
@@ -77,20 +76,13 @@
 				<artifactId>plexus-utils</artifactId>
 				<version>${plexus-utils-version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-common</artifactId>
-				<version>${runeduniverse-utils-common-version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-logging</artifactId>
-				<version>${runeduniverse-utils-logging-version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-maven</artifactId>
-				<version>${runeduniverse-utils-maven-version}</version>
+				<artifactId>utils-bom</artifactId>
+				<version>${runeduniverse-utils-bom-version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

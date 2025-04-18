@@ -16,7 +16,8 @@ import org.apache.maven.execution.MavenSession;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Node;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.NodeContext;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Phase;
@@ -191,12 +192,12 @@ public class DefaultPipeline implements Pipeline {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree nodes = new CompoundTree("nodes");
+		CompoundTree nodes = new DefaultCompoundTree("nodes");
 		for (Node node : this.nodes.values())
 			nodes.append(node.toRecord());
-		CompoundTree resourceTypes = new CompoundTree("resourceTypes",
+		CompoundTree resourceTypes = new DefaultCompoundTree("resourceTypes",
 				'[' + String.join(", ", this.resourceTypes.keySet()) + ']');
-		return new CompoundTree("Pipeline").append(nodes)
+		return new DefaultCompoundTree("Pipeline").append(nodes)
 				.append(resourceTypes);
 	}
 

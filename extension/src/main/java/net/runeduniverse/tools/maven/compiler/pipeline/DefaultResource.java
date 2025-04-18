@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.Resource;
 import net.runeduniverse.tools.maven.compiler.pipeline.api.ResourceType;
 

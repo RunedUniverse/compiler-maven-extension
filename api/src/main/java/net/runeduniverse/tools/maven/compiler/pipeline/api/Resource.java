@@ -3,7 +3,7 @@ package net.runeduniverse.tools.maven.compiler.pipeline.api;
 import java.io.File;
 import java.util.Collection;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public interface Resource extends Recordable {
 

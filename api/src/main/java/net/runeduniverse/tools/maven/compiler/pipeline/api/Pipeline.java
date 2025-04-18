@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.apache.maven.execution.MavenSession;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public interface Pipeline extends Recordable {
 
